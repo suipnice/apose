@@ -1,0 +1,16 @@
+# Comportement par défaut (fin de lignes), au cas où les utilisateurs n'auraient pas défini core.autocrlf.
+* text=auto
+
+# Fichiers texte que vous souhaitez toujours normaliser et convertir
+# *.c text
+# *.h text
+*.sh text eol=lf
+
+# Fichiers qui auront toujours des fins de ligne CRLF.
+# *.sln text eol=crlf
+*.bat text eol=crlf
+
+# Tous les fichiers qui sont vraiment binaires et ne doivent pas être modifiés.
+*.png binary
+*.jpg binary
+*.webp binary
