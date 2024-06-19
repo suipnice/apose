@@ -1,0 +1,75 @@
+:root{
+	--primary-color: #2E79C6;
+}
+
+.bg-primary {
+	background-color: var(--primary-color);
+}
+
+body {
+	font-size: 14px;
+}
+
+html,
+footer {
+	background-color: #EEE;
+}
+
+.container {
+	background-color: #FFF;
+}
+
+.is-test,
+.is-debug {
+	top: 0;
+	position: fixed;
+	right: 0;
+	z-index: 30;
+	background-color: red;
+	display: inline-table;
+	padding: 0.5em 2em;
+	color: white;
+}
+
+.is-debug {
+	right: 100px;
+	background-color: blue;
+}
+
+.content h1,
+.content h2 {
+	color: var(--primary-color);
+}
+
+.option .field-label {
+	flex-basis: 20em;
+}
+
+.bouton_submit {
+	border-width: 1px;
+	color: #FFF;
+	cursor: pointer;
+	justify-content: center;
+	padding-bottom: calc(.5em - 1px);
+	padding-left: 1em;
+	padding-right: 1em;
+	padding-top: calc(.5em - 1px);
+	text-align: center;
+	white-space: nowrap;
+	margin-bottom: .5rem;
+	border-radius: .375em;
+	box-shadow: none;
+	display: inline-flex;
+	height: 2.5em;
+	background-color: var(--primary-color);
+	border-color: transparent;
+	min-width: 6em;
+}
+
+.bouton_submit:hover {
+	background-color: #3488ce;
+}
+
+.bouton_submit a {
+	color: #FFF;
+}
