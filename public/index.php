@@ -25,7 +25,7 @@ if (isset($_SESSION['authen']) === false) {
         "researcher",
         "employee"
     ];
-    if (in_array($statut, $authorized)) {
+    if (in_array($statut, $authorized) === true) {
         $_SESSION['authen'] = "ok";
         // Redirection.
         echo '<meta http-equiv="Refresh" content="0;url=comp.php">';
@@ -54,4 +54,4 @@ if (isset($_SESSION['authen']) === false) {
         echo "</div></div></div></div>";
         include "../include/footer.php";
     } // end if authorized status
-}
+} // end if isset(authen)

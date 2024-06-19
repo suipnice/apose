@@ -32,17 +32,20 @@ if (isset($_SESSION["authen"]) === false or $_SESSION["authen"] !== 'ok') {
         $numero = filter_input(INPUT_POST, "numero");
         $ladd = filter_input(INPUT_POST, "ladd");
         $charge = filter_input(INPUT_POST, "charge");
-        $_SESSION['cod_ses'] = filter_input(INPUT_POST, "cod_ses");
-        $_SESSION['epr'] = filter_input(INPUT_POST, "epr");
+        $cod_ses = getPostInt("cod_ses");
+        $_SESSION['cod_ses'] = $cod_ses;
+        $aff_epr = getPostInt("epr");
+        $_SESSION['epr'] = $aff_epr;
         $cod_anu = filter_input(INPUT_POST, "cod_anu");
         $cycle = filter_input(INPUT_POST, "cycle");
 
-        if ($RefEtp) {
+        if (strpos($RefEtp, "|") !== false) {
             list($cod_etp_cible, $cod_vrs_vet, $comp, $cod_anu, $cycle) = explode(
                 "|",
                 $RefEtp
             );
         }
+
         if ($type === "webip") {
             $pdf = 0;
             $nom_fic = CHEMIN_PUBLIC . "pdf/" . $cod_etp_cible . ".csv";
@@ -68,37 +71,36 @@ if (isset($_SESSION["authen"]) === false or $_SESSION["authen"] !== 'ok') {
         <p>État de la modélisation APOGEE :
             <strong>$cod_etp_cible $cod_vrs_vet</strong> --
             <strong>$lib_etp</strong></p>";
-        if ($_SESSION['epr'] === '1') {
+        if ($aff_epr === 1) {
             $res2 .= '<div class="columns">';
             $res2 .= '<div class="column">';
-            $cod_ses = $_SESSION['cod_ses'];
-            if ($cod_ses === '0') {
+            if ($cod_ses === 0) {
                 $res2 .= 'Épreuves : <strong>Session Unique</strong>';
-            } elseif ($cod_ses === '4') {
+            } elseif ($cod_ses === 4) {
                 $res2 .= 'Épreuves : <strong>toutes sessions</strong>';
             } else {
                 $res2 .= "Épreuves : <strong>Session $cod_ses</strong>";
             }
             $res2 .= "</div><div class='column'>";
             $res2 .= '<p>Légende :</p><ul>';
-            if ($cod_ses === '1' || $cod_ses === '4') {
+            if ($cod_ses === 1 || $cod_ses === 4) {
                 $res2 .= '<li class="sess-1">Épreuves SESSION 1</li>';
             }
-            if ($cod_ses === '2' || $cod_ses === '4') {
+            if ($cod_ses === 2 || $cod_ses === 4) {
                 $res2 .= '<li class="sess-2">Épreuves SESSION 2</li>';
             }
-            if ($cod_ses === '0' || $cod_ses === '4') {
+            if ($cod_ses === 0 || $cod_ses === 4) {
                 $res2 .= '<li class="sess-0">Épreuves SESSION Unique</li>';
             }
             $res2 .= '</ul>';
             $res2 .= "</div></div>";
-        }
+        } // end if aff_epr == 1
 
         $t_etp_lse = etpLse($cnx_mysql, $cod_etp_cible, $cod_vrs_vet);
 
         $res2 .= "";
 
-        $res_tablo[] = array(
+        $res_tablo[] = [
             "niveau",
             "cod_lse",
             "cod_elp",
@@ -110,7 +112,7 @@ if (isset($_SESSION["authen"]) === false or $_SESSION["authen"] !== 'ok') {
             "cod_elp_regroupe",
             "nb_fils",
             "lib_liste_filles"
-        );
+        ];
         $libcharge = "";
         if ($charge === '1') {
             $resentetes = mysqli_query(
@@ -128,7 +130,7 @@ if (isset($_SESSION["authen"]) === false or $_SESSION["authen"] !== 'ok') {
                     $libcharge .= "<th scope='col'>Charges Ens<br>
                         " . $rowchg['COD_TYP_HEU'] . "</th>";
                     $entetes[$index] = $rowchg['COD_TYP_HEU'];
-                    $index = $index + 1;
+                    $index += 1;
                 }
             }
         } else {
@@ -147,11 +149,11 @@ if (isset($_SESSION["authen"]) === false or $_SESSION["authen"] !== 'ok') {
                  where vet_regroupe_lse.cod_lse = liste_elp.cod_lse
                  and liste_elp.cod_lse='$cod_lse'"
             );
-            while ($row = mysqli_fetch_row($req)) {
+            while (is_array($row = mysqli_fetch_row($req)) === true) {
                 $lib_liste = $row[1];
                 $max = $row[2];
                 $min = $row[3];
-                if (!empty($max)) {
+                if (empty($max) === false) {
                     $lib_liste .= " (Liste à choix $max $min)";
                 }
             }
@@ -164,7 +166,7 @@ if (isset($_SESSION["authen"]) === false or $_SESSION["authen"] !== 'ok') {
                 $res2 .= "<table id='arbo2'
                     class='table is-striped is-hoverable is-fullwidth'>";
                 $res2 .= "<caption>$cod_lse" . " : $lib_liste</caption>";
-                if ($_SESSION['epr'] === 1) {
+                if ($aff_epr === 1) {
                     $libses = "<br>/ Session";
                 } else {
                     $libses = "";
@@ -225,7 +227,7 @@ if (isset($_SESSION["authen"]) === false or $_SESSION["authen"] !== 'ok') {
                 $cnx_mysql,
                 "SELECT lib_cmp FROM composante WHERE cod_cmp='$comp'"
             );
-            while ($row = mysqli_fetch_row($reqa)) {
+            while (is_array($row = mysqli_fetch_row($reqa)) === true) {
                 $lib_comp = $row[0];
             }// fin while lib composante
             ?>

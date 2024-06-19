@@ -23,8 +23,9 @@ require "../param.php";
  */
 function getPostInt($param, $default = 0)
 {
-    $def = array('options' => array('default' => $default));
+    $def = ['options' => ['default' => $default]];
     return filter_input(INPUT_POST, $param, FILTER_VALIDATE_INT, $def);
+
 }
 
 
@@ -35,13 +36,13 @@ function getPostInt($param, $default = 0)
  */
 function authentificationCAS()
 {
-    // Import de la librairie CAS
+    // Import de la librairie CAS.
     include_once "../CAS.php";
-    // Import des paramètres du serveur CAS
+    // Import des paramètres du serveur CAS.
     global $connexionCAS;
     global $logoutCas;
 
-    // Initialisation phpCAS
+    // Initialisation phpCAS.
     $phpCAS = new phpCAS();
     if ($connexionCAS !== "active") {
         $phpCAS->client(
@@ -68,7 +69,8 @@ function authentificationCAS()
     $statut = identificationLDAP($usernameCAS);
 
     return $statut;
-} //end authentification_CAS()
+
+} // end authentification_CAS()
 
 
 /**
@@ -95,6 +97,7 @@ function identificationLDAP($login)
      * 2ème étape : on effectue une liaison au serveur, ici de type "anonyme"
      * pour une recherche permise par un accès en lecture seule
      */
+
     // On dit qu'on utilise LDAP V3, sinon la V2 par défaut est utilisé
     // et le bind ne passe pas.
     ldap_set_option($conn, LDAP_OPT_PROTOCOL_VERSION, 3);
@@ -128,6 +131,7 @@ function identificationLDAP($login)
     ldap_close($conn);
 
     return $prim_affiliation;
+
 }
 
 
@@ -154,6 +158,7 @@ function connexionMysql(
     }
     printf("Échec de la connexion : %s\n", mysqli_connect_error());
     exit();
+
 }
 
 
@@ -183,6 +188,7 @@ function requete($cnx_mysql, $libreq, $debug = 0)
 
     echo $erreur;
     die('UNE ERREUR A ÉTÉ RENCONTRÉE\n ');
+
 }
 
 
@@ -209,6 +215,7 @@ function etpLse($cnx_mysql, $cod_etp_cible, $cod_vrs_vet)
         $res[] = $fetched['cod_lse'];
     }
     return $res;
+
 }
 
 
@@ -234,19 +241,22 @@ function chercheElpFils(
     $niveau,
     $type = "tableau",
     $numero = 0,
-    $res_tablo = array()
+    $res_tablo = []
 ) {
-    //GLOBAL $apogee;
+    // GLOBAL $apogee;
     $res = "";
     $tabulation1 = "";
     $tabulation2 = "";
     $cod1 = "";
     $cod2 = "";
-    // Libelle Annexe Descriptive du Diplome
+    // Libelle Annexe Descriptive du Diplome.
     $ladd = filter_input(INPUT_POST, 'ladd');
-    $charge = filter_input(INPUT_POST, 'charge'); // Charge d'enseignement
-    // $epr = filter_input(INPUT_POST, "epr"); // Affichage epreuve
-    // $ses = filter_input(INPUT_POST, "cod_ses"); // Affichage session
+    // Charge d'enseignement.
+    $charge = filter_input(INPUT_POST, 'charge');
+    // Affichage epreuve.
+    // $epr = filter_input(INPUT_POST, "epr");
+    // Affichage session.
+    // $ses = filter_input(INPUT_POST, "cod_ses");
 
     $label_sess = [
         "0" => "Unique",
@@ -298,7 +308,7 @@ function chercheElpFils(
         $cod_pel = $fetched['cod_pel'];
         $nbr_crd_elp = $fetched['nbr_crd_elp'];
 
-        // Recuperation nb IP de l'elp
+        // Recuperation nb IP de l'elp.
         $reqnbip = requete(
             $cnx_mysql,
             "SELECT table_elp_nbetu.nb_etu_ip
@@ -363,7 +373,7 @@ function chercheElpFils(
         if ($type === "tableau") {
             $affcharge = '';
             if ($charge === "1") {
-                // Recup infos Charge
+                // Recup infos Charge.
                 $sql = "SELECT DISTINCT COD_TYP_HEU,
                                NB_HEU_ELP
                      FROM elp_chg_typ_heu
@@ -407,14 +417,14 @@ function chercheElpFils(
         }
 
         $lib_liste_filles = "";
-        $t_liste_lse_filles = array();
+        $t_liste_lse_filles = [];
         while (is_array($fetch2 = mysqli_fetch_assoc($req2)) === true) {
             $t_liste_lse_filles[] = $fetch2;
             $lib_liste_filles .= "[" . implode("|", $fetch2) . "]";
         }
 
         $cod_elp_regroupe = "";
-        $res_tablo[] = array(
+        $res_tablo[] = [
             $niveau,
             $cod_lse,
             $cod_elp,
@@ -424,9 +434,9 @@ function chercheElpFils(
             $cod_elp_regroupe,
             $nb_fils,
             $lib_liste_filles
-        );
+        ];
 
-        // desc = 1 si il y a des fils/filles
+        // desc = 1 si il y a des fils/filles.
         if ($desc === 1) {
             foreach ($t_liste_lse_filles as $key => $r2) {
                 $max = $r2['nbr_max_elp_obl_chx'];
@@ -463,7 +473,7 @@ function chercheElpFils(
                 if ($_SESSION['epr'] === '1') {
                     $code_ses = $_SESSION['cod_ses'];
                     if ($code_ses === '4') {
-                        // Affichage de toutes les sessions
+                        // Affichage de toutes les sessions.
                         $critsess = '';
                     } else {
                         $critsess = "and cod_ses='$code_ses'";
@@ -496,9 +506,9 @@ function chercheElpFils(
                         $res .= "<td></td><td></td><td></td>";
                         $res .= "</tr>";
                     }
-                }//Fin If Affichage des sessions
+                }// End If Affichage des sessions
 
-                // montage pdf-csv
+                // Montage pdf-csv.
                 if ($type === "webip") {
                     $res_tablo = chercheElpFils(
                         $cnx_mysql,
@@ -578,6 +588,7 @@ function chercheElpFils(
         $res .= "</ul>";
     }
     return $res;
+
 }
 
 

@@ -23,23 +23,25 @@ if ($_SESSION["authen"] !== 'ok') {
 
     $pdf = "";
     $res = "";
-    $res0 = "";//Affichage du nb etape
+    // Affichage du nb etape.
+    $res0 = "";
     $res2 = "";
-    $res3 = "";//Liste des Etapes non Modélisées dans Apogée
+    // Liste des Etapes non Modélisées dans Apogée.
+    $res3 = "";
     $adresse = "";
     $cpt = 0;
 
-    // Recupération de la composante et de l'annee
+    // Recupération de la composante et de l'annee.
     $comp = filter_input(INPUT_POST, "Liste_Comp");
     $cod_anu = filter_input(INPUT_POST, "cod_anu");
 
-    // Memorisation et prise en compte du choix des boutons radios lors du retour
+    // Memorisation et prise en compte du choix des boutons radios lors du retour.
     $radio_numero = getPostInt('numero');
     $radio_ladd = getPostInt('ladd');
     $radio_charge = getPostInt('charge');
 
-    $def_zero = array('options' => array('default' => 0));
-    $def_one = array('options' => array('default' => 1));
+    $def_zero = ['options' => ['default' => 0]];
+    $def_one = ['options' => ['default' => 1]];
 
     $radio_epr = filter_var($_SESSION['epr'], FILTER_VALIDATE_INT, $def_zero);
     $radio_ses = filter_var($_SESSION['cod_ses'], FILTER_VALIDATE_INT, $def_one);
@@ -70,7 +72,6 @@ if ($_SESSION["authen"] !== 'ok') {
 
     $rescycle = requete($cnx_mysql, $reqcycle);
     while (is_array($enrcycle = mysqli_fetch_array($rescycle)) === true) {
-
         $reqetape = "SELECT etape.cod_etp,etape.cod_vrs_vet,
                     etape.lic_etp,etape.lib_etp,
                     etape.cod_cyc, etape.cod_cmp, etape.cod_anu,cod_lse,
@@ -93,6 +94,7 @@ if ($_SESSION["authen"] !== 'ok') {
             $res2 .= "</tbody></table>";
             $res3 .= "</tbody></table>";
         }
+
         $cycle_index++;
 
         $table_css = 'class="table is-striped is-fullwidth
@@ -106,7 +108,7 @@ if ($_SESSION["authen"] !== 'ok') {
         $res3 .= $table_headers2;
 
         while (is_array($fetched = mysqli_fetch_assoc($req)) === true) {
-            $cpt = $cpt + 1;
+            $cpt += 1;
             $cod_etp = $fetched['cod_etp'];
             $lib_etp = $fetched['lib_etp'];
             $cod_vrs_vet = $fetched['cod_vrs_vet'];
@@ -130,7 +132,8 @@ if ($_SESSION["authen"] !== 'ok') {
                 $res3 .= "<td> $lib_etp ($cod_etp / $cod_vrs_vet)</td>";
                 $res3 .= "<td>$deb_rec/$fin_rec</td>";
             }
-            //Recup nb etu
+
+            // Recup nb etu.
             $sqletu = "SELECT nb_etu FROM table_etape_apo
                 WHERE table_etape_apo.cod_etp='$cod_etp'
                 AND table_etape_apo.cod_vrs_vet='$cod_vrs_vet'
@@ -147,15 +150,16 @@ if ($_SESSION["authen"] !== 'ok') {
                 while (is_array($enretu = mysqli_fetch_array($resetu)) === true) {
                     if ($fetched['cod_lse'] !== '') {
                         $res2 .= "<td>$enretu[0]</td></tr>";
-
                     } else {
                         $res3 .= "<td>$enretu[0]</td></tr>";
                     }
                 }
             }
 
-        } //fin while liste etape
-    } //Fin While recup Cycle
+        } //end while liste etape
+
+    } //end while recup Cycle
+
     $res2 .= "</table></fieldset></form>";
     $res3 .= "</table>";
     $cpt = 0;
@@ -165,14 +169,14 @@ if ($_SESSION["authen"] !== 'ok') {
     <div class="container">
         <div class="content p-2">
             <?php
-            //Affichage du libellé de la composante
+            // Affichage du libellé de la composante.
             $reqa = requete(
                 $cnx_mysql,
                 "select lib_cmp from composante where cod_cmp='$comp'"
             );
-            while ($row = mysqli_fetch_row($reqa)) {
+            while (is_array($row = mysqli_fetch_row($reqa)) === true) {
                 $lib_comp = $row[0];
-            }//fin while lib composante
+            }
             ?>
             <a href="comp.php"><span class='bouton-submit'>Retour</span></a>
 

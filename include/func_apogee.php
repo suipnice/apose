@@ -31,9 +31,11 @@ function connexionOracle(
     if ($cnxoracle !== false) {
         return $cnxoracle;
     }
+
     $err = oci_error();
     die("Connexion $base_oracle impossible " . $err['message'] . "\n");
-}
+
+} // end connexionOracle()
 
 
 /**
@@ -62,6 +64,7 @@ GROUP BY APOGEE.INS_ADM_ETP.COD_ANU,APOGEE.INS_ADM_ETP.COD_ETP,
          APOGEE.VERSION_ETAPE.LIB_WEB_VET, APOGEE.ETAPE.COD_CYC,
          APOGEE.INS_ADM_ETP.COD_CMP";
     return $query;
+
 }
 
 
@@ -94,6 +97,7 @@ GROUP BY APOGEE.VDI_FRACTIONNER_VET.COD_ETP,
          APOGEE.VDI_FRACTIONNER_VET.DAA_DEB_RCT_VET,
          APOGEE.VDI_FRACTIONNER_VET.DAA_FIN_RCT_VET";
     return $query;
+
 }
 
 
@@ -108,6 +112,7 @@ function queryAnneeUniApo()
 FROM APOGEE.ANNEE_UNI
 where ETA_ANU_IAE='O'";
     return $query;
+
 }
 
 
@@ -123,6 +128,7 @@ FROM annee_uni
 WHERE cod_anu>=(
     SELECT cod_anu FROM annee_uni WHERE eta_anu_iae='O')";
     return $query;
+
 }
 
 
@@ -136,6 +142,7 @@ function queryEpreuve()
     $query = "SELECT COD_EPR, LIB_EPR, COD_NEP, COD_TEP
 FROM APOGEE.EPREUVE";
     return $query;
+
 }
 
 
@@ -149,6 +156,7 @@ function queryEprSanctionneElp()
     $query = "SELECT COD_ELP, COD_EPR, COD_SES
 FROM APOGEE.EPR_SANCTIONNE_ELP where TEM_SUS_EPR_SES = 'N'";
     return $query;
+
 }
 
 
@@ -162,8 +170,9 @@ function queryComposante()
     $query = "SELECT COD_CMP, LIB_CMP, INT_1_EDI_DIP_CMP
 FROM APOGEE.COMPOSANTE WHERE TEM_EN_SVE_CMP = 'O'
 and cod_rne_cmp is not null";
-    //AND APOGEE.COMPOSANTE.COD_NAT_CMP = 'J'";
+    // AND APOGEE.COMPOSANTE.COD_NAT_CMP = 'J'";
     return $query;
+
 }
 
 
@@ -190,6 +199,7 @@ GROUP BY APOGEE.INS_ADM_ETP.COD_ANU,APOGEE.INS_ADM_ETP.COD_ETP,
          APOGEE.INS_ADM_ETP.COD_VRS_VET,
          APOGEE.VERSION_ETAPE.LIB_WEB_VET";
     return $query;
+
 }
 
 
@@ -214,6 +224,7 @@ GROUP BY APOGEE.IND_CONTRAT_ELP.COD_ANU,
          APOGEE.IND_CONTRAT_ELP.COD_VRS_VET,
          APOGEE.IND_CONTRAT_ELP.COD_ELP";
     return $query;
+
 }
 
 
@@ -229,6 +240,7 @@ function queryVetRegrLse()
     FROM APOGEE.vet_regroupe_lse
     WHERE DAT_FRM_REL_LSE_VET IS NULL ";
     return $query;
+
 }
 
 
@@ -243,6 +255,7 @@ function queryElpRegroupeLse()
  FROM APOGEE.elp_regroupe_lse
  WHERE DAT_FRM_REL_LSE_ELP IS NULL";
     return $query;
+
 }
 
 
@@ -256,6 +269,7 @@ function queryListes()
     $query = "SELECT COD_LSE,COD_TYP_LSE,ETA_LSE,LIC_LSE,LIB_LSE
 FROM APOGEE.liste_elp ";
     return $query;
+
 }
 
 
@@ -269,6 +283,7 @@ function queryLseRegroupeElp()
     $query = "SELECT COD_LSE,COD_ELP
 FROM APOGEE.lse_regroupe_elp";
     return $query;
+
 }
 
 
@@ -299,6 +314,7 @@ function queryTableElp()
   AND (APOGEE.ELP_LIBELLE.COD_LNG='FRAN'
   OR APOGEE.ELP_LIBELLE.COD_LNG IS NULL)";
     return $query;
+
 }
 
 
@@ -320,6 +336,7 @@ FROM APOGEE.ELP_CHARGE_ENS
 WHERE APOGEE.ELP_CHARGE_ENS.COD_ANU = '$year'
 AND APOGEE.ELP_CHARGE_ENS.TEM_CAL_CHG = 'O'";
     return $query;
+
 }
 
 
@@ -339,6 +356,7 @@ function queryTableChargeTypEns($year)
     FROM APOGEE.ELP_CHG_TYP_HEU
     WHERE APOGEE.ELP_CHG_TYP_HEU.COD_ANU='$year'";
     return $query;
+
 }
 
 
@@ -355,6 +373,7 @@ function queryTableTypHeure()
     FROM APOGEE.TYPE_HEURE
     WHERE APOGEE.TYPE_HEURE.TEM_EN_SVE_TYP_HEU = 'O'";
     return $query;
+
 }
 
 
@@ -383,7 +402,7 @@ function recupSimple(
     $result = oci_execute($cursor);
     oci_fetch_all($cursor, $result);
 
-    if ($cursor !== false and $result === true ) {
+    if ($cursor !== false and $result === true) {
         $result = oci_execute($cursor);
         requete($cnx_mysql, "lock tables $nom_table_mysql write");
 
@@ -409,5 +428,5 @@ function recupSimple(
             "Erreur Requete ORACLE \n$lib_query\n
             " . print_r(oci_error($cursor)) . "\n"
         );
-    }
+    } //end if
 }

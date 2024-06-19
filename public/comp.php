@@ -43,7 +43,7 @@ if (isset($_SESSION["authen"]) === false or $_SESSION["authen"] !== 'ok') {
                                     <div class="select">
                                         <select name="cod_anu" id="cod_anu">
                                             <?php
-                                            //recuperation des annees
+                                            // Recuperation des annees.
                                             $sql = "SELECT cod_anu FROM annee_uni";
                                             $res = mysqli_query($link, $sql);
                                             $i = 0;
@@ -56,7 +56,7 @@ if (isset($_SESSION["authen"]) === false or $_SESSION["authen"] !== 'ok') {
                                                 echo "<option value='" . $enr[0] . "'
                                                     >" . $enr[0] . "</option>";
                                             }
-                                            ;
+
                                             ?>
                                         </select>
                                     </div>
@@ -149,5 +149,5 @@ if (isset($_SESSION["authen"]) === false or $_SESSION["authen"] !== 'ok') {
 
     <?php
     include "../include/footer.php";
-}
+} // end if authen == OK
 ?>
