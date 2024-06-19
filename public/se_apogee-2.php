@@ -12,7 +12,7 @@
  * @link     https://git.unice.fr/dsi-sen/apose
  */
 session_start();
-if ($_SESSION['authen'] != 'ok') {
+if ($_SESSION["authen"] !== 'ok') {
     session_destroy();
     echo '<meta http-equiv="Refresh" content="0;url=index.php">';
 } else {
@@ -20,25 +20,23 @@ if ($_SESSION['authen'] != 'ok') {
     include "../include/header.php";
     $cnx_mysql = connexionMysql();
 
-    $action = $_GET["action"];
-
     $pdf = "";
     $res = "";
     $res2 = "";
     $adresse = "";
     $cpt = 0;
 
-    if (!empty($_POST)) {
+    if (empty($_POST) === false) {
 
-        $RefEtp = $_POST["RefEtp"];
-        $type = $_POST["type"];
-        $numero = $_POST["numero"];
-        $ladd = $_POST["ladd"];
-        $charge = $_POST["charge"];
-        $_SESSION['cod_ses'] = $_POST["cod_ses"];
-        $_SESSION['epr'] = $_POST["epr"];
-        $cod_anu = $_POST["cod_anu"];
-        $cycle = $_POST["cycle"];
+        $RefEtp = filter_input(INPUT_POST, "RefEtp");
+        $type = filter_input(INPUT_POST, "type");
+        $numero = filter_input(INPUT_POST, "numero");
+        $ladd = filter_input(INPUT_POST, "ladd");
+        $charge = filter_input(INPUT_POST, "charge");
+        $_SESSION['cod_ses'] = filter_input(INPUT_POST, "cod_ses");
+        $_SESSION['epr'] = filter_input(INPUT_POST, "epr");
+        $cod_anu = filter_input(INPUT_POST, "cod_anu");
+        $cycle = filter_input(INPUT_POST, "cycle");
 
         if ($RefEtp) {
             list($cod_etp_cible, $cod_vrs_vet, $comp, $cod_anu, $cycle) = explode(
@@ -46,7 +44,7 @@ if ($_SESSION['authen'] != 'ok') {
                 $RefEtp
             );
         }
-        if ($type == "webip") {
+        if ($type === "webip") {
             $pdf = 0;
             $nom_fic = CHEMIN_PUBLIC . "pdf/" . $cod_etp_cible . ".csv";
             $fic = fopen($nom_fic, "w");
@@ -71,26 +69,26 @@ if ($_SESSION['authen'] != 'ok') {
         <p>État de la modélisation APOGEE :
             <strong>$cod_etp_cible $cod_vrs_vet</strong> --
             <strong>$lib_etp</strong></p>";
-        if ($_SESSION['epr'] == '1') {
+        if ($_SESSION['epr'] === '1') {
             $res2 .= '<div class="columns">';
             $res2 .= '<div class="column">';
             $cod_ses = $_SESSION['cod_ses'];
-            if ($cod_ses == '0') {
+            if ($cod_ses === '0') {
                 $res2 .= 'Épreuves : <strong>Session Unique</strong>';
-            } elseif ($cod_ses == '4') {
+            } elseif ($cod_ses === '4') {
                 $res2 .= 'Épreuves : <strong>toutes sessions</strong>';
             } else {
                 $res2 .= "Épreuves : <strong>Session $cod_ses</strong>";
             }
             $res2 .= "</div><div class='column'>";
             $res2 .= '<p>Légende :</p><ul>';
-            if ($cod_ses == '1' || $cod_ses == '4') {
+            if ($cod_ses === '1' || $cod_ses === '4') {
                 $res2 .= '<li class="sess-1">Épreuves SESSION 1</li>';
             }
-            if ($cod_ses == '2' || $cod_ses == '4') {
+            if ($cod_ses === '2' || $cod_ses === '4') {
                 $res2 .= '<li class="sess-2">Épreuves SESSION 2</li>';
             }
-            if ($cod_ses == '0' || $cod_ses == '4') {
+            if ($cod_ses === '0' || $cod_ses === '4') {
                 $res2 .= '<li class="sess-0">Épreuves SESSION Unique</li>';
             }
             $res2 .= '</ul>';
@@ -115,7 +113,7 @@ if ($_SESSION['authen'] != 'ok') {
             "lib_liste_filles"
         );
         $libcharge = "";
-        if ($charge == '1') {
+        if ($charge === '1') {
             $resentetes = mysqli_query(
                 $cnx_mysql,
                 "SELECT type_heure.COD_TYP_HEU, type_heure.NUM_ORD_TYP_HEU
@@ -157,7 +155,7 @@ if ($_SESSION['authen'] != 'ok') {
                 }
             }
 
-            if ($type == "tableau") {
+            if ($type === "tableau") {
                 $res2 .= '<div class="has-text-right">';
                 $res2 .= '<a class="button" id="copyBtn">';
                 $res2 .= getIconText("clipboard", "Copier le tableau");
@@ -165,7 +163,7 @@ if ($_SESSION['authen'] != 'ok') {
                 $res2 .= "<table id='arbo2'
                     class='table is-striped is-hoverable is-fullwidth'>";
                 $res2 .= "<caption>$cod_lse"." : $lib_liste</caption>";
-                if ($_SESSION['epr'] == 1) {
+                if ($_SESSION['epr'] === 1) {
                     $libses = "<br>/ Session";
                 } else {
                     $libses = "";
@@ -193,16 +191,15 @@ if ($_SESSION['authen'] != 'ok') {
                 $niveau,
                 $type,
                 $numero,
-                "",
                 $res_tablo
             );
-            if ($type == "webip") {
+            if ($type === "webip") {
                 $res_tablo = $res_tmp;
             } else {
                 $res2 .= $res_tmp;
             }
 
-            if ($type == "tableau") {
+            if ($type === "tableau") {
                 $res2 .= "</table>";
             }
         }

@@ -20,7 +20,7 @@ define("APP_MODE_DEBUG", "NO");
 
 define("UNIV_NAME", "Université XXX");
 
-if (APP_MODE_TEST == "YES") {
+if (APP_MODE_TEST === "YES") {
     // #### MODE TEST ####
     define("APP_NAME", "ApoSE TEST");
 

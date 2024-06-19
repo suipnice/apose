@@ -28,22 +28,21 @@ function connexionOracle(
     $base_oracle = BASE_ORACLE
 ) {
     $cnxoracle = oci_connect($user_oracle, $passwd_oracle, $base_oracle);
-    if ($cnxoracle == false) {
-        $e = oci_error();
-        die("Connexion $base_oracle impossible " . $e['message'] . "\n");
-    } else {
+    if ($cnxoracle !== false) {
         return $cnxoracle;
     }
+    $err = oci_error();
+    die("Connexion $base_oracle impossible " . $err['message'] . "\n");
 }
 
 /**
  * [Description for queryTableEtape]
  *
- * @param string $an Année universitaire
+ * @param string $year Année universitaire
  *
  * @return [type]
  */
-function queryTableEtape($an)
+function queryTableEtape($year)
 {
     $query = "SELECT APOGEE.INS_ADM_ETP.COD_ANU,
     APOGEE.INS_ADM_ETP.COD_ETP,APOGEE.INS_ADM_ETP.COD_VRS_VET,
@@ -56,7 +55,7 @@ AND APOGEE.INS_ADM_ETP.ETA_PMT_IAE='P'
 AND APOGEE.INS_ADM_ETP.COD_ETP = APOGEE.ETAPE.COD_ETP
 AND APOGEE.INS_ADM_ETP.COD_ETP = APOGEE.VERSION_ETAPE.COD_ETP
 AND APOGEE.INS_ADM_ETP.COD_VRS_VET = APOGEE.VERSION_ETAPE.COD_VRS_VET
-AND APOGEE.INS_ADM_ETP.COD_ANU='$an'
+AND APOGEE.INS_ADM_ETP.COD_ANU='$year'
 GROUP BY APOGEE.INS_ADM_ETP.COD_ANU,APOGEE.INS_ADM_ETP.COD_ETP,
          APOGEE.INS_ADM_ETP.COD_VRS_VET, APOGEE.ETAPE.LIC_ETP,
          APOGEE.VERSION_ETAPE.LIB_WEB_VET, APOGEE.ETAPE.COD_CYC,
@@ -67,24 +66,24 @@ GROUP BY APOGEE.INS_ADM_ETP.COD_ANU,APOGEE.INS_ADM_ETP.COD_ETP,
 /**
  * [Description for queryEtape]
  *
- * @param string $an Année universitaire
+ * @param string $year Année universitaire
  *
  * @return [type]
  */
-function queryEtape($an)
+function queryEtape($year)
 {
     $query = "SELECT APOGEE.VDI_FRACTIONNER_VET.COD_ETP,
     APOGEE.VDI_FRACTIONNER_VET.COD_VRS_VET, APOGEE.ETAPE.LIC_ETP,
     APOGEE.VERSION_ETAPE.LIB_WEB_VET, APOGEE.ETAPE.COD_CYC,
-    APOGEE.VERSION_ETAPE.COD_CMP, '$an' AS COD_ANU,
+    APOGEE.VERSION_ETAPE.COD_CMP, '$year' AS COD_ANU,
     APOGEE.VDI_FRACTIONNER_VET.DAA_DEB_RCT_VET,
     APOGEE.VDI_FRACTIONNER_VET.DAA_FIN_RCT_VET
 FROM APOGEE.VDI_FRACTIONNER_VET,APOGEE.VERSION_ETAPE,APOGEE.ETAPE
 WHERE APOGEE.VDI_FRACTIONNER_VET.COD_ETP = APOGEE.VERSION_ETAPE.COD_ETP
 AND APOGEE.VDI_FRACTIONNER_VET.COD_VRS_VET = APOGEE.VERSION_ETAPE.COD_VRS_VET
 AND APOGEE.VERSION_ETAPE.COD_ETP=APOGEE.ETAPE.COD_ETP
-AND APOGEE.VDI_FRACTIONNER_VET.DAA_FIN_RCT_VET>='$an'
-AND APOGEE.VDI_FRACTIONNER_VET.DAA_DEB_RCT_VET<='$an'
+AND APOGEE.VDI_FRACTIONNER_VET.DAA_FIN_RCT_VET>='$year'
+AND APOGEE.VDI_FRACTIONNER_VET.DAA_DEB_RCT_VET<='$year'
 GROUP BY APOGEE.VDI_FRACTIONNER_VET.COD_ETP,
          APOGEE.VDI_FRACTIONNER_VET.COD_VRS_VET,
          APOGEE.ETAPE.LIC_ETP, APOGEE.VERSION_ETAPE.LIB_WEB_VET,
@@ -163,11 +162,11 @@ and cod_rne_cmp is not null";
 /**
  * [Description for queryTableEtapeNbetu]
  *
- * @param string $an Année universitaire
+ * @param string $year Année universitaire
  *
  * @return [type]
  */
-function queryTableEtapeNbetu($an)
+function queryTableEtapeNbetu($year)
 {
     $query = "SELECT APOGEE.INS_ADM_ETP.COD_ANU,
     APOGEE.INS_ADM_ETP.COD_ETP,APOGEE.INS_ADM_ETP.COD_VRS_VET,
@@ -178,7 +177,7 @@ WHERE APOGEE.INS_ADM_ETP.ETA_IAE='E'
 AND APOGEE.INS_ADM_ETP.ETA_PMT_IAE='P'
 AND APOGEE.INS_ADM_ETP.COD_ETP = APOGEE.VERSION_ETAPE.COD_ETP
 AND APOGEE.INS_ADM_ETP.COD_VRS_VET = APOGEE.VERSION_ETAPE.COD_VRS_VET
-AND APOGEE.INS_ADM_ETP.COD_ANU = '$an'
+AND APOGEE.INS_ADM_ETP.COD_ANU = '$year'
 GROUP BY APOGEE.INS_ADM_ETP.COD_ANU,APOGEE.INS_ADM_ETP.COD_ETP,
          APOGEE.INS_ADM_ETP.COD_VRS_VET,
          APOGEE.VERSION_ETAPE.LIB_WEB_VET";
@@ -188,18 +187,18 @@ GROUP BY APOGEE.INS_ADM_ETP.COD_ANU,APOGEE.INS_ADM_ETP.COD_ETP,
 /**
  * [Description for queryTableElpNbetu]
  *
- * @param string $an Année universitaire
+ * @param string $year Année universitaire
  *
  * @return [type]
  */
-function queryTableElpNbetu($an)
+function queryTableElpNbetu($year)
 {
     $query = "SELECT APOGEE.IND_CONTRAT_ELP.COD_ANU,
     APOGEE.IND_CONTRAT_ELP.COD_ETP,APOGEE.IND_CONTRAT_ELP.COD_VRS_VET,
     APOGEE.IND_CONTRAT_ELP.COD_ELP,
     Count(APOGEE.IND_CONTRAT_ELP.COD_IND) AS nb_etu_ip
 FROM APOGEE.IND_CONTRAT_ELP
-WHERE APOGEE.IND_CONTRAT_ELP.COD_ANU = '$an'
+WHERE APOGEE.IND_CONTRAT_ELP.COD_ANU = '$year'
 AND APOGEE.IND_CONTRAT_ELP.TEM_PRC_ICE='N'
 GROUP BY APOGEE.IND_CONTRAT_ELP.COD_ANU,
          APOGEE.IND_CONTRAT_ELP.COD_ETP,
@@ -290,11 +289,11 @@ function queryTableElp()
 /**
  * [Description for queryTableElpChargeEns]
  *
- * @param string $an Année universitaire
+ * @param string $year Année universitaire
  *
  * @return [type]
  */
-function queryTableElpChargeEns($an)
+function queryTableElpChargeEns($year)
 {
     $query = "SELECT APOGEE.ELP_CHARGE_ENS.COD_ELP,
     APOGEE.ELP_CHARGE_ENS.COD_ANU,
@@ -302,7 +301,7 @@ function queryTableElpChargeEns($an)
     APOGEE.ELP_CHARGE_ENS.nbr_heu_td_elp,
     APOGEE.ELP_CHARGE_ENS.nbr_heu_tp_elp
 FROM APOGEE.ELP_CHARGE_ENS
-WHERE APOGEE.ELP_CHARGE_ENS.COD_ANU = '$an'
+WHERE APOGEE.ELP_CHARGE_ENS.COD_ANU = '$year'
 AND APOGEE.ELP_CHARGE_ENS.TEM_CAL_CHG = 'O'";
     return $query;
 }
@@ -310,18 +309,18 @@ AND APOGEE.ELP_CHARGE_ENS.TEM_CAL_CHG = 'O'";
 /**
  * [Description for queryTableChargeTypEns]
  *
- * @param string $an Année universitaire
+ * @param string $year Année universitaire
  *
  * @return [type]
  */
-function queryTableChargeTypEns($an)
+function queryTableChargeTypEns($year)
 {
     $query = "SELECT APOGEE.ELP_CHG_TYP_HEU.COD_ELP,
         APOGEE.ELP_CHG_TYP_HEU.COD_ANU,
         APOGEE.ELP_CHG_TYP_HEU.COD_TYP_HEU,
         APOGEE.ELP_CHG_TYP_HEU.NBR_HEU_ELP
     FROM APOGEE.ELP_CHG_TYP_HEU
-    WHERE APOGEE.ELP_CHG_TYP_HEU.COD_ANU='$an'";
+    WHERE APOGEE.ELP_CHG_TYP_HEU.COD_ANU='$year'";
     return $query;
 }
 
@@ -356,31 +355,30 @@ function recupSimple(
     $nom_table_mysql,
     $lib_query
 ) {
-    //fonction de debug, verifier si debug YES dans param.php
+    // Fonction de debug, verifier si debug YES dans param.php.
     debug("table " . $nom_table_mysql . "<br><br>" . $lib_query);
 
-    set_time_limit(600); //10min
+    // 10min
+    set_time_limit(600);
     $cursor = oci_parse($cnx_oracle, $lib_query);
     $result = oci_execute($cursor);
-    $nrows = oci_fetch_all($cursor, $result);
+    oci_fetch_all($cursor, $result);
 
     if ($cursor and $result) {
         $result = oci_execute($cursor);
         requete($cnx_mysql, "lock tables $nom_table_mysql write");
-        $i = 0;
 
-        while ($row = oci_fetch_object($cursor)) {
+        while ($row = oci_fetch_object($cursor) === true) {
             $sql = "'";
-            $i++;
 
             foreach ($row as $cle => $valeur) {
                 $valeur = str_replace(",", ".", $valeur);
                 $sql .= str_replace("'", "\\'", $valeur) . "','";
             }
-            $sql = substr($sql, 0, -2); /* Enleve les 2 caracteres à la fin */
+            $sql = substr($sql, 0, -2); /* Enleve les 2 caracteres à la fin (,') */
 
             $req_insert_sql = "INSERT INTO " . $nom_table_mysql . "
-                               values(" . $sql . ")";
+                               VALUES(" . $sql . ")";
 
             requete($cnx_mysql, $req_insert_sql);
         }

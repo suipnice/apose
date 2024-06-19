@@ -13,7 +13,7 @@
  */
 
 session_start();
-if ($_SESSION['authen'] != 'ok') {
+if ($_SESSION['authen'] !== 'ok') {
     session_destroy();
     echo '<meta http-equiv="Refresh" content="0;url=index.php">';
 } else {

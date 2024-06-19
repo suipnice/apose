@@ -25,7 +25,7 @@ if (php_sapi_name() !== 'cli') {
     // Si l'aplication est lancée depuis le web,
     // on s'assure que l'utilisateur est connecté.
     session_start();
-    if ($_SESSION['authen'] !== 'ok') {
+    if ($_SESSION["authen"] !== 'ok') {
         die('Accès refusé.');
     }
     echo '<html><body><pre>';

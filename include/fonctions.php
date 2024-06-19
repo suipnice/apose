@@ -27,12 +27,13 @@ function authentificationCAS()
     global $connexionCAS;
     global $logoutCas;
 
+    $phpCAS = new phpCAS();
     // initialisation phpCAS
-    if ($connexionCAS != "active") {
+    if ($connexionCAS !== "active") {
         $config_CAS_host = CAS_HOST;
         $config_CAS_portNumber = CAS_PORT;
         $config_CAS_URI = CAS_URI;
-        $CASCnx = phpCAS::client(
+        $phpCAS->client(
             CAS_VERSION_2_0,
             $config_CAS_host,
             $config_CAS_portNumber,
@@ -41,18 +42,18 @@ function authentificationCAS()
         $connexionCAS = "active";
     }
 
-    if ($logoutCas == 1) {
-        phpCAS::logout();
+    if ($logoutCas === 1) {
+        $phpCAS->logout();
     }
 
-    // Redirection vers la page d'authentification de CAS
-    phpCAS::setNoCasServerValidation();
-    phpCAS::forceAuthentication();
+    // Redirection vers la page d'authentification de CAS.
+    $phpCAS->setNoCasServerValidation();
+    $phpCAS->forceAuthentication();
 
-    // L'utilisateur a été correctement identifié
-    $usernameCAS = phpCAS::getUser();
+    // L'utilisateur a été correctement identifié.
+    $usernameCAS = $phpCAS->getUser();
 
-    // On lance l'identification LDAP avec le UID de la personne
+    // On lance l'identification LDAP avec le UID de la personne.
     $statut = identificationLDAP($usernameCAS);
 
     return $statut;
@@ -72,7 +73,6 @@ function identificationLDAP($login)
 
     $baseDN = LDAP_BASE_DN;
     $ldapServer = LDAP_SERVEUR;
-    $ldapServerPort = LDAP_PORT;
 
     /* mot clef de la recherche*/
     $keyword = $login;
@@ -89,7 +89,7 @@ function identificationLDAP($login)
 
     // Instruction de liaison.
     // Connexion Manager
-    $bindServerLDAP = ldap_bind($conn, LDAP_BIND_RDN, LDAP_BIND_PWD);
+    ldap_bind($conn, LDAP_BIND_RDN, LDAP_BIND_PWD);
 
     /* 3ème étape : on effectue une recherche avec le dn de base */
     $query = "(&(uid=" . $keyword . "))";
@@ -202,15 +202,14 @@ function etpLse($cnx_mysql, $cod_etp_cible, $cod_vrs_vet)
 /**
  * Recuperation des elp fils d'une liste d'une version d'etape
  *
- * @param mysqli $cnx_mysql          Instanciated mysqli class
- * @param mixed  $nbchg              nbchg
- * @param mixed  $entetes            entetes
- * @param mixed  $cod_lse            cod_lse
- * @param mixed  $niveau             niveau
- * @param string $type               'Tableau' ou '?'
- * @param mixed  $numero             numero
- * @param mixed  $lib_niveau_initial lib_niveau_initial
- * @param mixed  $res_tablo          res_tablo
+ * @param mysqli $cnx_mysql Instanciated mysqli class
+ * @param mixed  $nbchg     nbchg
+ * @param mixed  $entetes   entetes
+ * @param mixed  $cod_lse   cod_lse
+ * @param mixed  $niveau    niveau
+ * @param string $type      'Tableau' ou '?'
+ * @param mixed  $numero    numero
+ * @param mixed  $res_tablo res_tablo
  *
  * @return mixed elp fils
  */
@@ -222,7 +221,6 @@ function chercheElpFils(
     $niveau,
     $type = "tableau",
     $numero = 0,
-    $lib_niveau_initial = "",
     $res_tablo = array()
 ) {
     //GLOBAL $apogee;
@@ -231,10 +229,11 @@ function chercheElpFils(
     $tabulation2 = "";
     $c1 = "";
     $c2 = "";
-    $ladd = $_POST["ladd"]; // Libelle Annexe Descriptive du Diplome
-    $charge = $_POST["charge"]; // Charge d'enseignement
-    // $epr = $_POST["epr"]; // Affichage epreuve
-    // $ses = $_POST["cod_ses"]; // Affichage session
+    // Libelle Annexe Descriptive du Diplome
+    $ladd = filter_input(INPUT_POST, 'ladd');
+    $charge = filter_input(INPUT_POST, 'charge'); // Charge d'enseignement
+    // $epr = filter_input(INPUT_POST, "epr"); // Affichage epreuve
+    // $ses = filter_input(INPUT_POST, "cod_ses"); // Affichage session
 
     $label_sess = [
         "0" => "Unique",
@@ -242,14 +241,14 @@ function chercheElpFils(
         "2" => "2",
     ];
 
-    if ($type == "tableau") {
+    if ($type === "tableau") {
         for ($i = 1; $i < $niveau; $i++) {
             $tabulation1 .= "&nbsp;&nbsp;&nbsp;";
             $tabulation2 .= "";
         }
-        $t1 = "td";
+        $tag = "td";
     } else {
-        $t1 = "span";
+        $tag = "span";
         $tabulation1 = "";
         $res .= "<ul type='none'>";
         $c1 = "[";
@@ -258,7 +257,7 @@ function chercheElpFils(
 
     $etp = $_SESSION['cod_etp_cible'];
     $cod_vrs_vet = $_SESSION['cod_vrs_vet'];
-    $cod_anu = $_POST['cod_anu'];
+    $cod_anu = filter_input(INPUT_POST, 'cod_anu');
 
     $req = requete(
         $cnx_mysql,
@@ -300,10 +299,10 @@ function chercheElpFils(
         }
 
         // avec lib ADD
-        if ($ladd == "1") {
+        if ($ladd === "1") {
             $i++;
             // Ne faire apparaitre l'ADD que pour les élements SEM et UE
-            if ($cod_nel == "UE" or $cod_nel == "SE") {
+            if ($cod_nel === "UE" or $cod_nel === "SE") {
                 $lib_elp = $r['lib_elp'] . "<br>
                     <span class='lib-add'>" . $r['lib_elp_lng'] . "</span>";
             } else {
@@ -317,7 +316,7 @@ function chercheElpFils(
         if ($type <> "tableau") {
             $tabulation1 = "";
         }
-        if ($type == "tableau") {
+        if ($type === "tableau") {
             $res .= "<tr><td>";
         } else {
             $res .= "<li>";
@@ -335,25 +334,22 @@ function chercheElpFils(
         $nb_fils = mysqli_num_rows($req2);
         if ($nb_fils > 0) {
             $desc = 1;
-            $g1 = '<strong class="apo-parent">';
-            $g2 = "</strong>";
+            $tag1 = '<strong class="apo-parent">';
+            $tag2 = "</strong>";
         } else {
             $desc = 0;
-            $g1 = "";
-            $g2 = "";
+            $tag1 = "";
+            $tag2 = "";
         }
 
-        // sous une autre forme
-        // if($numero and $nb_fils>0) $lib_niveau = $lib_niveau_initial."$i";
-        // else $lib_niveau="";
         if ($numero) {
             $lib_niveau = "$niveau.$i";
         } else {
             $lib_niveau = "";
         }
-        if ($type == "tableau") {
+        if ($type === "tableau") {
             $affcharge = '';
-            if ($charge == "1") {
+            if ($charge === "1") {
                 // Recup infos Charge
                 $sql = "SELECT DISTINCT COD_TYP_HEU,
                                NB_HEU_ELP
@@ -363,7 +359,7 @@ function chercheElpFils(
                      ORDER BY COD_TYP_HEU;";
                 debug($sql);
                 $rescharge = $cnx_mysql->query($sql);
-                if ($rescharge->num_rows == 0) {
+                if ($rescharge->num_rows === 0) {
                     for ($n = 0; $n < $nbchg; $n++) {
                         $affcharge = $affcharge . "<td class='no-charge'></td>";
                     }
@@ -387,14 +383,14 @@ function chercheElpFils(
                 }
             }
 
-            $res .= "$tabulation1 $lib_niveau $g1$lib_elp$g2
-                     $tabulation2 <$t1 rel='cod_elp'> $c1$cod_elp$c2 </$t1>
-                     <$t1 rel='cod_nel'>$cod_nel</$t1>
-                     <$t1 rel='cod_pel'>$cod_pel</$t1>
-                     <$t1 rel='nb_crd_elp'>$nbr_crd_elp</$t1>
-                     <$t1 rel='nbetu'>$elp_nbetu</$t1> $affcharge";
+            $res .= "$tabulation1 $lib_niveau $tag1$lib_elp$tag2
+                     $tabulation2 <$tag rel='cod_elp'> $c1$cod_elp$c2 </$tag>
+                     <$tag rel='cod_nel'>$cod_nel</$tag>
+                     <$tag rel='cod_pel'>$cod_pel</$tag>
+                     <$tag rel='nb_crd_elp'>$nbr_crd_elp</$tag>
+                     <$tag rel='nbetu'>$elp_nbetu</$tag> $affcharge";
         } else {
-            $res .= "$tabulation1 $lib_niveau $g1$lib_elp$g2";
+            $res .= "$tabulation1 $lib_niveau $tag1$lib_elp$tag2";
         }
 
         $lib_liste_filles = "";
@@ -406,7 +402,7 @@ function chercheElpFils(
         }
 
         $cod_elp_regroupe = "";
-        $l = array(
+        $res_tablo[] = array(
             $niveau,
             $cod_lse,
             $cod_elp,
@@ -417,16 +413,15 @@ function chercheElpFils(
             $nb_fils,
             $lib_liste_filles
         );
-        $res_tablo[] = $l;
 
         // desc = 1 si il y a des fils/filles
-        if ($desc == 1) {
+        if ($desc === 1) {
             foreach ($t_liste_lse_filles as $k => $r2) {
                 $max = $r2['nbr_max_elp_obl_chx'];
                 $min = $r2['nbr_min_elp_obl_chx'];
                 $cod_lse_aff = $r2['cod_lse'];
-                if ($type == "tableau") {
-                    $res .= "<$t1 rel='cod_lse'><em>$cod_lse_aff</em></$t1>";
+                if ($type === "tableau") {
+                    $res .= "<$tag rel='cod_lse'><em>$cod_lse_aff</em></$tag>";
                 }
                 if ($max > 1) {
                     $pluriel = "s";
@@ -434,17 +429,17 @@ function chercheElpFils(
                     $pluriel = "";
                 }
                 $card = "&nbsp;";
-                if ($min and $min == $max) {
+                if ($min and $min === $max) {
                     $card = " $max élément$pluriel à choisir";
                 }
                 if ($min and $min < $max) {
                     $card = " de $min à $max élément$pluriel à choisir";
                 }
-                $res .= "<$t1 rel='obs'>$card</$t1>";
+                $res .= "<$tag rel='obs'>$card</$tag>";
                 if ($numero and $type <> "tableau") {
                     $res .= ":";
                 }
-                if ($type == "tableau") {
+                if ($type === "tableau") {
                     $res .= "</tr>";
                 } else {
                     $res .= "</li>";
@@ -453,12 +448,13 @@ function chercheElpFils(
                 // AFFICHAGE SESSIONS paramètres :
                 // 1=session 1 | 2=session 2
                 // 3=session  unique | 4=toutes les sessions
-                if ($_SESSION['epr'] == '1') {
-                    if ($_SESSION['cod_ses'] == '4') {
+                if ($_SESSION['epr'] === '1') {
+                    $code_ses = $_SESSION['cod_ses'];
+                    if ($code_ses === '4') {
                         // Affichage de toutes les sessions
                         $critsess = '';
                     } else {
-                        $critsess = "and cod_ses='" . $_SESSION['cod_ses'] . "'";
+                        $critsess = "and cod_ses='$code_ses'";
                     }
 
                     //Recherche d'epreuve pour l'element
@@ -482,7 +478,7 @@ function chercheElpFils(
                             <td>" . $repr[3] . "</td>
                             <td>" . $repr[4] . "</td>";
 
-                        if ($charge == "1") {
+                        if ($charge === "1") {
                             $res .= "<td></td><td></td><td></td>";
                         }
                         $res .= "<td></td><td></td><td></td>";
@@ -491,7 +487,7 @@ function chercheElpFils(
                 }//Fin If Affichage des sessions
 
                 // montage pdf-csv
-                if ($type == "webip") {
+                if ($type === "webip") {
                     $res_tablo = chercheElpFils(
                         $cnx_mysql,
                         $nbchg,
@@ -500,7 +496,6 @@ function chercheElpFils(
                         $niveau + 1,
                         $type,
                         $numero,
-                        $lib_niveau,
                         $res_tablo
                     );
                 } else {
@@ -512,23 +507,23 @@ function chercheElpFils(
                         $niveau + 1,
                         $type,
                         $numero,
-                        $lib_niveau
                     ) . "";
                 }
             }
         }
 
-        if ($desc == 0) {
-            if ($type == "tableau") {
-                $res .= "<$t1>&nbsp;</$t1><$t1>&nbsp;</$t1></tr>";
+        if ($desc === 0) {
+            if ($type === "tableau") {
+                $res .= "<$tag>&nbsp;</$tag><$tag>&nbsp;</$tag></tr>";
             } else {
                 $res .= "";
             }
-            if ($_SESSION['epr'] == '1') {
-                if ($_SESSION['cod_ses'] == '4') {//Affichage de toutes les sessions
+            if ($_SESSION['epr'] === '1') {
+                $cod_ses = $_SESSION['cod_ses'];
+                if ($cod_ses === '4') {//Affichage de toutes les sessions
                     $critsess = '';
                 } else {
-                    $critsess = "AND epr_sanctionne_elp.cod_ses='" . $_SESSION['cod_ses'] . "'";
+                    $critsess = "AND epr_sanctionne_elp.cod_ses='$cod_ses'";
                 }
                 //Recherche d'epreuve pour l'element
                 $reqepr = mysqli_query(
@@ -551,7 +546,7 @@ function chercheElpFils(
                             <td rel='repr2'>" . $repr[2] . "</td>
                             <td rel='repr3'>" . $repr[3] . "</td>
                             <td rel='repr4'>" . $label_sess[$repr[4]] . "</td>";
-                    if ($charge == "1") {
+                    if ($charge === "1") {
                         $res .= "<td></td><td></td><td></td>";
                     }
                     $res .= "<td></td><td></td><td></td>";
@@ -562,10 +557,10 @@ function chercheElpFils(
 
     }
 
-    if ($type == "webip") {
+    if ($type === "webip") {
         return $res_tablo;
     }
-    if ($type == "tableau") {
+    if ($type === "tableau") {
         $res .= "";
     } else {
         $res .= "</ul>";
@@ -582,7 +577,7 @@ function chercheElpFils(
  */
 function debug($value)
 {
-    if (APP_MODE_DEBUG == "YES") {
+    if (APP_MODE_DEBUG === "YES") {
         echo '<pre class="debug">';
         if ($value) {
             if (is_array($value) or is_object($value)) {

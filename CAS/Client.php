@@ -2105,7 +2105,7 @@ class CAS_Client
 			$pgt_iou = trim($tree_response->getElementsByTagName("proxyGrantingTicket")->item(0)->nodeValue);
 			if(preg_match('/PGTIOU-[\.\-\w]/',$pgt_iou)){
 				$pgt = $this->loadPGT($pgt_iou);
-				if ( $pgt == FALSE ) {
+				if ( $pgt === FALSE ) {
 					phpCAS::trace('could not load PGT');
 					$this->authError('PGT Iou was transmitted but PGT could not be retrieved',
 					$validate_url,

@@ -30,12 +30,12 @@
 </head>
 
 <body class="">
-    <?php if (APP_MODE_TEST == "YES") { ?>
+    <?php if (APP_MODE_TEST === "YES") { ?>
         <div class="is-test">
             Site Test
         </div>
     <?php } ?>
-    <?php if (APP_MODE_DEBUG == "YES") { ?>
+    <?php if (APP_MODE_DEBUG === "YES") { ?>
         <div class="is-debug">
             Mode Debug
         </div>

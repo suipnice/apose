@@ -300,7 +300,7 @@ $GLOBALS['PHPCAS_DEBUG'] = array(
 // ########################################################################
 
 // include client class
-include_once (dirname(__FILE__) . '/CAS/Client.php');
+require_once dirname(__FILE__) . '/CAS/Client.php';
 
 // ########################################################################
 //  INTERFACE CLASS

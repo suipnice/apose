@@ -15,10 +15,16 @@ require_once "../CAS.php";
 require "../include/fonctions.php";
 
 // On vérifie si la variable de session du profil est définie,
-// sinon on demande une authentification CAS
+// sinon on demande une authentification CAS.
 if (!isset($_SESSION['authen'])) {
     $statut = authentificationCAS();
-    $authorized = array("staff", "teacher", "faculty", "researcher", "employee");
+    $authorized = array(
+        "staff",
+        "teacher",
+        "faculty",
+        "researcher",
+        "employee"
+    );
     if (in_array($statut, $authorized)) {
         $_SESSION['authen'] = "ok";
         //redirection
@@ -26,9 +32,10 @@ if (!isset($_SESSION['authen'])) {
     } else {
         $user = phpCAS::getUser();
         include "../include/header.php";
-        if ($statut == "") {
+        if ($statut === "") {
             $statut = "aucune";
         }
+
         echo '<div class="container">
         <div class="box mt-6">
             <div class="content">
@@ -46,5 +53,5 @@ if (!isset($_SESSION['authen'])) {
             Contactez votre référent RH de proximité pour en savoir plus.</p>";
         echo "</div></div></div></div>";
         include "../include/footer.php";
-    }
+    } // end if authorized status
 }
