@@ -19,8 +19,6 @@ These are mostly guidelines, not rules. Use your best judgment, and feel free to
 
 * [Coding conventions](#coding-conventions)
   * [JavaScript Styleguide](#javascript-styleguide)
-  * [Python Styleguide](#python-styleguide)
-
 
 ## Code of Conduct
 
@@ -38,7 +36,6 @@ and find related reports :mag_right:.
 When you are creating a bug report, please [include as many details as possible](#how-do-i-submit-a-good-bug-report).
 
 > **Note:** If you find a **Closed** issue that seems like it is the same thing that you're experiencing, open a new issue and include a link to the original issue in the body of your new one.
-
 
 #### How Do I Submit A (Good) Bug Report?
 
@@ -58,11 +55,9 @@ Include details about your configuration and environment:
 * **Which version are you using?**
 * **What's the name and version of the browser you're using**?
 
-
 ### Suggesting Enhancements
 
 This section guides you through submitting an enhancement suggestion, including completely new features and minor improvements to existing functionality. Following these guidelines helps maintainers and the community understand your suggestion :pencil: and find related suggestions :mag_right:.
-
 
 #### How Do I Submit A (Good) Enhancement Suggestion?
 
@@ -76,23 +71,22 @@ Create an issue and provide the following information:
 * **Specify which version of Pod you're using.**
 * **Specify the name and version of the browser you're using.**
 
-
 ### Pull Requests
 
 The process described here has several goals:
 
-- Maintain quality
-- Fix problems that are important to users
-- Engage the community in working toward the best possible Pod
-- Enable a sustainable system for maintainers to review contributions
+* Maintain quality
+* Fix problems that are important to users
+* Engage the community in working toward the best possible Pod
+* Enable a sustainable system for maintainers to review contributions
 
 Please follow these steps to have your contribution considered by the maintainers:
 
 0. Follow the [styleguides](#styleguides) below.
 1. Make sure that your pull request targets the `develop` branch.
-2. Prefix the title of your pull request with one of the following :
-  * `[WIP]` if your pull request is still a work in progress.
-  * `[DONE]` if you are done with your patch.
+2. Prefix the title of your pull request with one of the following:
+   * `[WIP]` if your pull request is still a work in progress.
+   * `[DONE]` if you are done with your patch.
 
 While the prerequisites above must be satisfied prior to having your pull request reviewed, the reviewer(s) may ask you to complete additional design work, tests, or other changes before your pull request can be ultimately accepted.
 
@@ -100,7 +94,7 @@ While the prerequisites above must be satisfied prior to having your pull reques
 
 ### Git config
 
-Warning about the configuration of line ending: https://docs.github.com/fr/get-started/getting-started-with-git/configuring-git-to-handle-line-endings
+Warning about the configuration of line ending: <https://docs.github.com/fr/get-started/getting-started-with-git/configuring-git-to-handle-line-endings>
 We add a .gitattributes file at the root of repository
 
 ### Git Commit Messages
@@ -110,7 +104,6 @@ We add a .gitattributes file at the root of repository
 * Limit the first line to 72 characters or less
 * Reference issues and pull requests liberally after the first line
 
-
 ## Coding conventions
 
 Start reading our code and you'll get the hang of it. We optimize for readability.
@@ -119,6 +112,14 @@ This is open source software. Consider the people who will read your code, and m
 ### JavaScript Styleguide
 
 All JavaScript code is linted with [eslint](https://eslint.org/).
+
+### Php Styleguide
+
+All Php code is linted with [Phpcs](https://github.com/squizlabs/PHP_CodeSniffer).
+
+### Markdown Styleguide
+
+All Markdown files are linted with [markdownlint](https://github.com/DavidAnson/markdownlint).
 
 ### Typography
 

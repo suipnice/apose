@@ -1,12 +1,3 @@
--- phpMyAdmin SQL Dump
--- version 4.0.10.20
--- https://www.phpmyadmin.net
---
--- Client: mysql.univ-tlse1.fr
--- Généré le: Mer 10 Mars 2021 à 16:12
--- Version du serveur: 5.5.68-MariaDB
--- Version de PHP: 5.3.3
-
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 SET time_zone = "+00:00";
 
@@ -56,7 +47,7 @@ CREATE TABLE IF NOT EXISTS `elp_chg_typ_heu` (
   `COD_ELP` varchar(12) NOT NULL,
   `COD_ANU` varchar(4) NOT NULL,
   `COD_TYP_HEU` varchar(8) NOT NULL,
-  `NBR_HEU_ELP` decimal(10,2) NOT NULL,
+  `NB_HEU_ELP` decimal(10,2) NOT NULL,
   PRIMARY KEY (`COD_ELP`,`COD_ANU`,`COD_TYP_HEU`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 

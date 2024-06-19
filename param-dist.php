@@ -1,4 +1,16 @@
 <?php
+/**
+ * ApoSE param.php
+ * php version 7
+ *
+ * @category Education
+ * @package  Apose
+ * @author   2014 - CRI Université Lille 2 <cri@univ-lille.fr>
+ * @author   2021-2024 - UniCA DSI <dsi.sen@univ-cotedazur.fr>
+ * @author   2022 - Université Toulouse 1 Capitole <dsi@univ-tlse1.fr>
+ * @license  GNU GPL
+ * @link     https://git.unice.fr/dsi-sen/apose
+ */
 
 //Set "YES" for mode test
 //Set "NO" for mode prod
@@ -42,5 +54,7 @@ DEFINE("CAS_URI", "");
 DEFINE("LDAP_BASE_DN", "ou=people,dc=univ,dc=fr");
 DEFINE("LDAP_SERVEUR", "ldap.univ.fr");
 DEFINE("LDAP_PORT", 389);
-// define("LDAP_BIND_RDN","manager");
-// define("LDAP_BIND_PWD","A_CHANGER");
+define("LDAP_BIND_RDN", "cn=manager,dc=univ,dc=fr");
+define("LDAP_BIND_PWD", "A_CHANGER");
+
+DEFINE("CHEMIN_PUBLIC", "/var/www/public/");

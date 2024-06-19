@@ -1,12 +1,25 @@
 <?php
+/**
+ * ApoSE comp.php
+ * php version 7
+ *
+ * @category Education
+ * @package  Apose
+ * @author   2014 - CRI Université Lille 2 <cri@univ-lille.fr>
+ * @author   2021-2024 - UniCA DSI <dsi.sen@univ-cotedazur.fr>
+ * @author   2022 - Université Toulouse 1 Capitole <dsi@univ-tlse1.fr>
+ * @license  GNU GPL
+ * @link     https://git.unice.fr/dsi-sen/apose
+ */
+
 session_start();
 if ($_SESSION['authen'] != 'ok') {
     session_destroy();
     echo '<meta http-equiv="Refresh" content="0;url=index.php">';
 } else {
-    include "include/fonctions.php";
-    include "header.php";
-    $link = connexion_mysql();
+    include "../include/fonctions.php";
+    include "../include/header.php";
+    $link = connexionMysql();
     ?>
     <div class="container">
         <div class="box mt-6">
@@ -32,12 +45,13 @@ if ($_SESSION['authen'] != 'ok') {
                                         <select name="cod_anu" id="cod_anu">
                                             <?php
                                             //recuperation des annees
-                                            $sql = "select cod_anu from annee_uni";
+                                            $sql = "SELECT cod_anu FROM annee_uni";
                                             $res = mysqli_query($link, $sql);
                                             $i = 0;
                                             while ($enr = mysqli_fetch_array($res)) {
                                                 $i++;
-                                                echo "<option value=" . $enr[0] . " >" . $enr[0] . "</option>\n";
+                                                echo "<option value='" . $enr[0] . "'
+                                                    >" . $enr[0] . "</option>";
                                             }
                                             ;
                                             ?>
@@ -60,10 +74,13 @@ if ($_SESSION['authen'] != 'ok') {
                                                 Sélectionnez une composante</option>
                                             <?php
                                             //recuperation des composantes
-                                            $sql = "select distinct lib_cmp, cod_cmp from composante order by lib_cmp";
+                                            $sql = "SELECT DISTINCT lib_cmp, cod_cmp
+                                                    FROM composante
+                                                    ORDER BY lib_cmp";
                                             $res = mysqli_query($link, $sql);
                                             while ($enr = mysqli_fetch_array($res)) {
-                                                echo "<option value=" . $enr[1] . " >" . $enr[0] . "</option>\n";
+                                                echo "<option value='" . $enr[1] . "'
+                                                     >" . $enr[0] . "</option>";
                                             }
                                             ;
                                             ?>
@@ -81,7 +98,7 @@ if ($_SESSION['authen'] != 'ok') {
                             <div class="field-body">
                                 <div class="field">
                                     <div class="control">
-                                        <input class="bouton_submit" type="submit"
+                                        <input class="bouton-submit" type="submit"
                                                value="Consulter">
                                     </div>
                                 </div>
@@ -96,24 +113,28 @@ if ($_SESSION['authen'] != 'ok') {
                     <ul>
                         <li>de sélectionner l'ensemble du document
                             <span class="icon has-text-info"><i
-                                  class="fas fa-mouse-pointer"></i></span></li>
+                                  class="fas fa-mouse-pointer"
+                                  aria-hidden="true"></i>
+                            </span></li>
                         <li>de le copier
                             <span class="icon has-text-info"><i
-                                  class="fas fa-copy"></i></span></li>
+                                  class="fas fa-copy"
+                                  aria-hidden="true"></i></span></li>
                         <li>et de le coller dans un nouveau document
                             Excel (Microsoft Office) ou Calc (OpenOffice)
                             <span class="icon has-text-info"><i
-                                  class="fas fa-file-excel"></i></span></li>
+                                  class="fas fa-file-excel"
+                                  aria-hidden="true"></i></span></li>
                     </ul>
 
                     <p><a href="./documentation/Guide_utilisateur_apose.pdf"
-                          target="_blank"><i
-                        class="fas fa-book"></i>&nbsp;Accéder
+                          target="_blank" class="button is-ghost"><i
+                        class="fas fa-book" aria-hidden="true"></i>&nbsp;Accéder
                         à la documentation (PDF)</a>
                     </p>
                 </div>
                 <div class="block has-text-centered pt-3">
-                    <hr />
+                    <hr>
                     <p>
                         <em>Données mises à jour 3 fois par jour à partir de la base
                             de production d’APOGEE (APOPROD) : 7H30/12H30/16H30.<br>
@@ -126,6 +147,6 @@ if ($_SESSION['authen'] != 'ok') {
     </div>
 
     <?php
-    include "footer.php";
+    include "../include/footer.php";
 }
 ?>

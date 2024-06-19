@@ -1,0 +1,138 @@
+:root {
+	--primary-color: #2E79C6;
+	--secondary-color: #b9dcfa;
+}
+
+/* Do not Capitalize th */
+.sortable thead th {
+	text-transform: none;
+}
+
+.bg-primary,
+.sortable thead .bg-primary th {
+	background-color: var(--primary-color);
+	color: #FFF;
+}
+
+.bg-secondary,
+.sortable thead .bg-secondary th {
+	background-color: var(--secondary-color);
+}
+
+
+.content table thead .bg-primary th {
+	color: #FFF;
+}
+
+body {
+	font-size: 14px;
+}
+
+html,
+footer {
+	background-color: #EEE;
+}
+
+.container {
+	background-color: #FFF;
+}
+
+.is-test,
+.is-debug {
+	top: 0;
+	position: fixed;
+	right: 0;
+	z-index: 30;
+	background-color: red;
+	display: inline-table;
+	padding: 0.5em 2em;
+	color: white;
+}
+
+.is-debug {
+	right: 100px;
+	background-color: blue;
+}
+
+pre.debug {
+	background-color: #EDF1F3;
+	border-color: #9AAAB4;
+	border-style: solid;
+	border-width: 1px;
+	margin: 10px 6px 10px 10px;
+	padding: 4pt;
+	text-align: left;
+}
+
+.content h1,
+.content h2 {
+	color: var(--primary-color);
+}
+
+.option .field-label {
+	flex-basis: 20em;
+}
+
+.option-recherche {
+	padding: 0.8em;
+	background-color: #f2f2f2;
+}
+
+.bouton-submit {
+	border-width: 1px;
+	color: #FFF;
+	cursor: pointer;
+	justify-content: center;
+	padding: calc(.5em - 1px) 1em;
+	text-align: center;
+	white-space: nowrap;
+	margin-bottom: .5rem;
+	border-radius: .375em;
+	box-shadow: none;
+	display: inline-flex;
+	height: 2.5em;
+	background-color: var(--primary-color);
+	border-color: transparent;
+	min-width: 6em;
+}
+
+.bouton-submit:hover {
+	background-color: #3488ce;
+}
+
+.bouton-submit a {
+	color: #FFF;
+}
+
+/* Session styles */
+
+li[class^="sess-"] {
+	padding-left:1em;
+}
+
+.sess-0,
+.sess-0 td{
+	background-color: #F9B7E5;
+}
+
+.sess-1,
+.sess-1 td{
+	background-color: #B7F9B9;
+}
+
+.sess-2,
+.sess-1 td{
+	background-color: #D7E8FE;
+}
+
+/*** ***/
+.apo-parent {
+	font-size: 110%;
+}
+
+.lib-add{
+	font-size: 88%;
+	font-weight: normal;
+	font-style: italic;
+	display: block;
+}

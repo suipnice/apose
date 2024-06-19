@@ -1,12 +1,24 @@
 <?php
+/**
+ * ApoSE se_apogee.php
+ * php version 7
+ *
+ * @category Education
+ * @package  Apose
+ * @author   2014 - CRI Université Lille 2 <cri@univ-lille.fr>
+ * @author   2021-2024 - UniCA DSI <dsi.sen@univ-cotedazur.fr>
+ * @author   2022 - Université Toulouse 1 Capitole <dsi@univ-tlse1.fr>
+ * @license  GNU GPL
+ * @link     https://git.unice.fr/dsi-sen/apose
+ */
 session_start();
 if ($_SESSION['authen'] != 'ok') {
     session_destroy();
     echo '<meta http-equiv="Refresh" content="0;url=index.php">';
 } else {
-    include "include/fonctions.php";
-    include "header.php";
-    $cnx_mysql = connexion_mysql();
+    include "../include/fonctions.php";
+    include "../include/header.php";
+    $cnx_mysql = connexionMysql();
 
     $pdf = "";
     $res = "";
@@ -47,37 +59,67 @@ if ($_SESSION['authen'] != 'ok') {
         $radio_ses = '1';
     }
 
+    $res2 .= "<h3>Liste des années d’études disponibles sur APOGEE :</h3>";
 
-    $res2 .= "<h3>Liste des années d'études disponibles sur APOGEE :</h3><table>";
+    $res3 .= "<hr><h3>Liste des années d’études non modélisées sur APOGEE :</h3>";
 
-    $res3 .= "<hr><h3>Liste des années d'études non modélisées sur APOGEE :</h3>
-            <table border=1 cellspacing=0 cellpadding=0>";
+    $reqcycle = "SELECT DISTINCT(etape.cod_cyc) FROM etape
+                WHERE etape.cod_cmp='" . $_POST['Liste_Comp'] . "'
+                AND etape.cod_anu='" . $_POST['cod_anu'] . "'
+                ORDER BY cod_cyc";
 
-    $reqcycle = "SELECT distinct(etape.cod_cyc) from etape
-                    where etape.cod_cmp='" . $_POST['Liste_Comp'] . "'
-                        AND etape.cod_anu='" . $_POST['cod_anu'] . "'
-                    order by cod_cyc";
-    debug($reqcycle);
+    $res2 .= "<fieldset><legend>Choisissez une année à afficher</legend>";
+    $cycle_index = 0;
+
+    $table_headers = '<thead><tr class="bg-primary">';
+    $table_headers .= '<th scope="col" class="no-sort">Choix</th>';
+    $table_headers .= '<th scope="col">Titre</th>';
+    $table_headers .= '<th scope="col">Recr.</th>';
+    $table_headers .= '<th scope="col">Nombre d’étudiants inscrits</th>';
+    $table_headers .= '</tr></thead>';
+
+    $table_headers2 = '<thead><tr class="bg-secondary">';
+    $table_headers2 .= '<th scope="col">Titre</th>';
+    $table_headers2 .= '<th scope="col">Recr.</th>';
+    $table_headers2 .= '<th scope="col">Nombre d’étudiants inscrits</th>';
+    $table_headers2 .= '</tr></thead><tbody>';
 
     $rescycle = requete($cnx_mysql, $reqcycle);
-
     while ($enrcycle = mysqli_fetch_array($rescycle)) {
 
-        $reqetape = "SELECT etape.cod_etp,etape.cod_vrs_vet,etape.lic_etp,etape.lib_etp, etape.cod_cyc, etape.cod_cmp, etape.cod_anu,cod_lse,DAA_DEB_RCT_VET,DAA_FIN_RCT_VET
+        $reqetape = "SELECT etape.cod_etp,etape.cod_vrs_vet,
+                    etape.lic_etp,etape.lib_etp,
+                    etape.cod_cyc, etape.cod_cmp, etape.cod_anu,cod_lse,
+                    DAA_DEB_RCT_VET,DAA_FIN_RCT_VET
                 FROM etape
                 LEFT JOIN vet_regroupe_lse
                 ON (etape.cod_vrs_vet = vet_regroupe_lse.cod_vrs_vet)
                 AND (etape.cod_etp = vet_regroupe_lse.cod_etp)
-                GROUP BY etape.cod_etp, etape.cod_vrs_vet, etape.lic_etp, etape.lib_etp, etape.cod_cyc, etape.cod_cmp, etape.cod_anu, etape.DAA_DEB_RCT_VET, etape.DAA_FIN_RCT_VET
+                GROUP BY etape.cod_etp, etape.cod_vrs_vet, etape.lic_etp,
+                         etape.lib_etp, etape.cod_cyc, etape.cod_cmp, etape.cod_anu,
+                         etape.DAA_DEB_RCT_VET, etape.DAA_FIN_RCT_VET
                 HAVING etape.cod_cmp='" . $_POST['Liste_Comp'] . "'
                 AND etape.cod_anu='" . $_POST['cod_anu'] . "'
                 and etape.cod_cyc='" . $enrcycle[0] . "'
                 ORDER BY etape.lib_etp";
-        debug($reqetape);
+
         $req = requete($cnx_mysql, $reqetape);
 
-        $res2 .= "<tr><td colspan='2' class='bg-primary'><a name=cyc" . $enrcycle[0] . "></a><span style='font-size:1.2em;color:#FFFFFF;'>Cycle " . $enrcycle[0] . "</span></td></tr>";
-        $res3 .= "<tr><td colspan='2' bgcolor='#b9dcfa'><font size=+0.5>Cycle " . $enrcycle[0] . "</font></td></tr>";
+        if ($cycle_index > 0) {
+            $res2 .= "</tbody></table>";
+            $res3 .= "</tbody></table>";
+        }
+        $cycle_index++;
+
+        $table_css = 'class="table is-striped is-fullwidth
+            caption-top sortable"';
+        $res2 .= "<table $table_css>";
+        $res3 .= "<table $table_css>";
+        $res2 .= "<caption id='cyc" . $enrcycle[0] . "'>
+            Cycle " . $enrcycle[0] . "</caption>";
+        $res3 .= "<caption>Cycle " . $enrcycle[0] . "</caption>";
+        $res2 .= $table_headers;
+        $res3 .= $table_headers2;
 
         while ($r = mysqli_fetch_assoc($req)) {
             $cpt = $cpt + 1;
@@ -87,42 +129,51 @@ if ($_SESSION['authen'] != 'ok') {
             $deb_rec = $r['DAA_DEB_RCT_VET'];
             $fin_rec = $r['DAA_FIN_RCT_VET'];
             if ($r['cod_lse'] != '') {
-                $res2 .= "<tr><td><a name=$cod_etp$cod_vrs_vet></a><input type=\"radio\" name=\"RefEtp\" value=\"$cod_etp|$cod_vrs_vet|$comp|$cod_anu|" . $enrcycle[0] . "\" OnClick=\"submit();\">";
-                $res2 .= "<input type=hidden name=cod_anu value=$cod_anu>";
-                $res2 .= "<input type=hidden name=cycle value=" . $enrcycle[0] . ">";
+                $res2 .= "<tr><td>
+                    <input type=\"radio\" name=\"RefEtp\"
+                        id='$cod_etp$cod_vrs_vet'
+                        value=\"$cod_etp|$cod_vrs_vet|$comp|$cod_anu|" . $enrcycle[0] . "\"
+                        OnClick=\"submit();\">";
+                $res2 .= "<input type='hidden' name='cod_anu' value=$cod_anu>";
+                $res2 .= "<input type='hidden' name='cycle'
+                                 value=" . $enrcycle[0] . ">";
                 $res2 .= "</td>";
-                $res2 .= "<td> $lib_etp ($cod_etp / $cod_vrs_vet) <b>-- Recr. $deb_rec/$fin_rec</b>";
-                //-- Nombre d'étudiants inscrits : $nb_etu</td></tr>";
+                $res2 .= "<td><label for='$cod_etp$cod_vrs_vet'>
+                    $lib_etp ($cod_etp / $cod_vrs_vet)</label></td>";
+                $res2 .= "<td>$deb_rec/$fin_rec</td>";
             } else {
                 $res3 .= "<tr>";
-                $res3 .= "<td> $lib_etp ($cod_etp / $cod_vrs_vet)<b> -- Recr. $deb_rec/$fin_rec</b>";
-                // -- Nombre d'étudiants inscrits : $nb_etu</td></tr>";
+                $res3 .= "<td> $lib_etp ($cod_etp / $cod_vrs_vet)</td>";
+                $res3 .= "<td>$deb_rec/$fin_rec</td>";
             }
             //Recup nb etu
-            $sqletu = "select nb_etu from table_etape_apo
-                where table_etape_apo.cod_etp='$cod_etp'
-                and table_etape_apo.cod_vrs_vet='$cod_vrs_vet'
-                and cod_anu='" . $_POST['cod_anu'] . "'
-                and cod_cmp='" . $_POST['Liste_Comp'] . "'";
+            $sqletu = "SELECT nb_etu FROM table_etape_apo
+                WHERE table_etape_apo.cod_etp='$cod_etp'
+                AND table_etape_apo.cod_vrs_vet='$cod_vrs_vet'
+                AND cod_anu='" . $_POST['cod_anu'] . "'
+                AND cod_cmp='" . $_POST['Liste_Comp'] . "'";
             $resetu = mysqli_query($cnx_mysql, $sqletu);
             if (mysqli_num_rows($resetu) == 0) {
-                echo "</td></tr>";
+                if ($r['cod_lse'] != '') {
+                    $res2 .= "<td> -- </td></tr>";
+                } else {
+                    $res3 .= "<td> -- </td></tr>";
+                }
             } else {
                 while ($enretu = mysqli_fetch_array($resetu)) {
                     if ($r['cod_lse'] != '') {
-                        $res2 .= " -- Nombre d’étudiants inscrits : <b>$enretu[0]</b></td></tr>";
+                        $res2 .= "<td>$enretu[0]</td></tr>";
+
                     } else {
-                        $res3 .= " -- Nombre d’étudiants inscrits : <b>$enretu[0]</b></td></tr>";
+                        $res3 .= "<td>$enretu[0]</td></tr>";
                     }
                 }
             }
 
         } //fin while liste etape
     } //Fin While recup Cycle
-
-    $res0 .= "<hr><strong class='mt-2'>" . $cpt . " Étapes </strong>";
-    $res2 .= "</table></span></form>";
-    $res3 .= "</table><br>";
+    $res2 .= "</table></fieldset></form>";
+    $res3 .= "</table>";
     $cpt = 0;
 
     ?>
@@ -131,12 +182,15 @@ if ($_SESSION['authen'] != 'ok') {
         <div class="content p-2">
             <?php
             //Affichage du libellé de la composante
-            $reqa = requete($cnx_mysql, "select lib_cmp from composante where cod_cmp='$comp'");
+            $reqa = requete(
+                $cnx_mysql,
+                "select lib_cmp from composante where cod_cmp='$comp'"
+            );
             while ($row = mysqli_fetch_row($reqa)) {
                 $lib_comp = $row[0];
             }//fin while lib composante
             ?>
-            <a href="comp.php"><span class='bouton_submit'>Retour</span></a>
+            <a href="comp.php"><span class='bouton-submit'>Retour</span></a>
 
             <h1 class="has-text-centered mt-2">
                 Consultation de la structure des enseignements
@@ -147,10 +201,13 @@ if ($_SESSION['authen'] != 'ok') {
 
             <form class="option" method="post" action="se_apogee-2.php">
                 <input type="hidden" name="type" value="tableau">
-                <div class="option-recherche" style="padding:0.8em; background-color:#f2f2f2;">
+                <fieldset class="option-recherche">
+                    <legend>Options d’affichage :</legend>
                     <div class="field is-horizontal">
                         <div class="field-label">
-                            <span class="label">INDICATEUR NUMERIQUE DE L'ARBORESCENCE : </span>
+                            <span class="label">
+                                INDICATEUR NUMÉRIQUE DE L’ARBORESCENCE :
+                            </span>
                         </div>
                         <div class="field-body">
                             <div class="control">
@@ -158,13 +215,13 @@ if ($_SESSION['authen'] != 'ok') {
                                     <input type="radio" name="numero" value="1" <?php
                                     if ($radio_numero == '1') {
                                         echo "checked";
-                                    } ?> /> Oui
+                                    } ?> > Oui
                                 </label>
                                 <label class="radio">
                                     <input type="radio" name="numero" value="0" <?php
                                     if ($radio_numero == '0') {
                                         echo "checked";
-                                    } ?> /> Non
+                                    } ?> > Non
                                 </label>
                             </div>
                         </div>
@@ -172,7 +229,7 @@ if ($_SESSION['authen'] != 'ok') {
                     <div class="field is-horizontal">
                         <div class="field-label">
                             <span class="label">
-                                LIBELLES DE L’ANNEXE DESCRIPTIVE DU DIPLOME :
+                                LIBELLÉS DE L’ANNEXE DESCRIPTIVE DU DIPLÔME :
                             </span>
                         </div>
                         <div class="field-body">
@@ -181,14 +238,14 @@ if ($_SESSION['authen'] != 'ok') {
                                     <input type="radio" name="ladd" value="1" <?php
                                     if ($radio_ladd == '1') {
                                         echo "checked";
-                                    } ?> /> Oui
+                                    } ?> > Oui
                                 </label>
                                 <label class="radio">
                                     <input type="radio" name="ladd" value="0" <?php
                                     if ($radio_ladd == '0') {
                                         echo "checked";
                                     }
-                                    ?> /> Non
+                                    ?> > Non
                                 </label>
                             </div>
                         </div>
@@ -203,34 +260,38 @@ if ($_SESSION['authen'] != 'ok') {
                                     <input type="radio" name="charge" value="1" <?php
                                     if ($radio_charge == '1') {
                                         echo "checked";
-                                    } ?> /> Oui
+                                    } ?> > Oui
                                 </label>
                                 <label class="radio">
                                     <input type="radio" name="charge" value="0" <?php
                                     if ($radio_charge == '0') {
                                         echo "checked";
-                                    } ?> /> Non
+                                    } ?> > Non
                                 </label>
                             </div>
                         </div>
                     </div>
                     <div class="field is-horizontal">
                         <div class="field-label">
-                            <span class="label">INFORMATIONS DES EPREUVES :</span>
+                            <span class="label">INFORMATIONS DES ÉPREUVES :</span>
                         </div>
                         <div class="field-body">
                             <div class="control">
                                 <label class="radio">
-                                    <input type="radio" class="session" name="epr" value="1" <?php
-                                    if ($radio_epr == '1') {
-                                        echo "checked";
-                                    } ?> /> Oui
+                                    <input type="radio" class="session"
+                                           name="epr" id="epr-1" value="1"
+                                        <?php
+                                        if ($radio_epr == '1') {
+                                            echo "checked";
+                                        } ?> > Oui
                                 </label>
                                 <label class="radio">
-                                    <input type="radio" class="session" name="epr" value="0" <?php
+                                    <input type="radio" class="session"
+                                           name="epr" id="epr-0" value="0"
+                                    <?php
                                     if ($radio_epr == '0') {
                                         echo "checked";
-                                    } ?> /> Non
+                                    } ?> > Non
                                 </label>
                             </div>
                         </div>
@@ -240,46 +301,42 @@ if ($_SESSION['authen'] != 'ok') {
                         echo "is-invisible";
                     } ?> ">
                         <div class="field-label">
-                            <span style="background-color:#DDDDDD"
-                                   class="label p-2">SESSIONS :</span>
+                            <span class="label p-2">SESSIONS :</span>
                         </div>
                         <div class="field-body">
                             <div class="control">
-                                <label style="background-color:#D7E8FE"
-                                       class="radio p-2">
-                                    <input type="radio" name="cod_ses"
-                                           value="1" <?php
-                                    if ($radio_ses == '1') {
-                                        echo "checked";
-                                    } ?> /> 1
+                                <label class="radio p-2 sess-1">
+                                    <input type="radio" name="cod_ses" value="1"
+                                        <?php
+                                        if ($radio_ses == '1') {
+                                            echo "checked";
+                                        } ?> > 1
                                 </label>
-                                <label style="background-color:#B7F9B9"
-                                       class="radio p-2">
-                                    <input type="radio" name="cod_ses"
-                                           value="2" <?php
-                                    if ($radio_ses == '2') {
-                                        echo "checked";
-                                    } ?> /> 2
+                                <label class="radio p-2 sess-2">
+                                    <input type="radio" name="cod_ses" value="2"
+                                        <?php
+                                        if ($radio_ses == '2') {
+                                            echo "checked";
+                                        } ?> > 2
                                 </label>
-                                <label style="background-color:#F9B7E5"
-                                       class="radio p-2">
-                                    <input type="radio" name="cod_ses"
-                                           value="0" <?php
-                                    if ($radio_ses == '0') {
-                                        echo "checked";
-                                    } ?> /> Unique
+                                <label class="radio p-2 sess-0">
+                                    <input type="radio" name="cod_ses" value="0"
+                                        <?php
+                                        if ($radio_ses == '0') {
+                                            echo "checked";
+                                        } ?> > Unique
                                 </label>
                                 <label class="radio p-2">
-                                    <input type="radio" name="cod_ses"
-                                           value="4" <?php
-                                    if ($radio_ses == '4') {
-                                        echo "checked";
-                                    } ?> /> Toutes les sessions
+                                    <input type="radio" name="cod_ses" value="4"
+                                        <?php
+                                        if ($radio_ses == '4') {
+                                            echo "checked";
+                                        } ?> > Toutes les sessions
                                 </label>
                             </div>
                         </div>
                     </div>
-                </div>
+                </fieldset>
 
                 <?php
                 echo $res0;
@@ -287,11 +344,11 @@ if ($_SESSION['authen'] != 'ok') {
                 echo $res;
                 echo $res3;
                 ?>
-                <a href="comp.php"><span class='bouton_submit'>Retour</span></a>
+                <a href="comp.php"><span class='bouton-submit'>Retour</span></a>
         </div>
     </div>
 
     <?php
-    include "footer.php";
+    include "../include/footer.php";
 }
 ?>
