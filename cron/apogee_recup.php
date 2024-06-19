@@ -12,8 +12,7 @@
  * @link     https://git.unice.fr/dsi-sen/apose
  */
 
- //die("recup apogee stoppé.");
-// SCRIPT DE RECUPERATION DES DONNEES APOGEE
+// die("recup apogee stoppé.");
 error_reporting(E_ALL);
 require "../include/fonctions.php";
 require "../include/func_apogee.php";
@@ -25,7 +24,7 @@ if (php_sapi_name() !== 'cli') {
     // Si l'aplication est lancée depuis le web,
     // on s'assure que l'utilisateur est connecté.
     session_start();
-    if ($_SESSION["authen"] !== 'ok') {
+    if (isset($_SESSION["authen"]) === false or $_SESSION["authen"] !== 'ok') {
         die('Accès refusé.');
     }
     echo '<html><body><pre>';
@@ -43,9 +42,9 @@ recupSimple($cnx_mysql, $cnx, "annee_uni", queryAnneeUniApoOuverte());
 $reqa = "select cod_anu from annee_uni";
 $resa = mysqli_query($cnx_mysql, $reqa);
 
-$tab_annees = array();
+$tab_annees = [];
 
-while ($enra = mysqli_fetch_array($resa)) {
+while (is_array($enra = mysqli_fetch_array($resa)) === true) {
     $tab_annees[] = $enra["cod_anu"];
 }
 
@@ -70,7 +69,7 @@ recupSimple($cnx_mysql, $cnx, "epr_sanctionne_elp", queryEprSanctionneElp());
 
 requete($cnx_mysql, "DELETE FROM table_etape_nbetu");
 foreach ($tab_annees as $key => $value) {
-    //echo "<br>table table_etape_nbetu ".$value."<br>";
+    // echo "<br>table table_etape_nbetu ".$value."<br>";
     recupSimple($cnx_mysql, $cnx, "table_etape_nbetu", queryTableEtapeNbetu($value));
 }
 
@@ -83,7 +82,7 @@ foreach ($tab_annees as $key => $value) {
 }
 
 // Pour la SE on ne peut que tout recuperer
-// (impossible de qualifer cod_etp recursivement)
+// (impossible de qualifer cod_etp recursivement).
 requete($cnx_mysql, "DELETE FROM vet_regroupe_lse");
 recupSimple($cnx_mysql, $cnx, "vet_regroupe_lse", queryVetRegrLse());
 
@@ -96,13 +95,11 @@ recupSimple($cnx_mysql, $cnx, "liste_elp", queryListes());
 requete($cnx_mysql, "DELETE FROM lse_regroupe_elp");
 recupSimple($cnx_mysql, $cnx, "lse_regroupe_elp", queryLseRegroupeElp());
 
-//modif oct. 2014 suite patch apogee 4.50
 requete($cnx_mysql, "DELETE FROM elp_chg_typ_heu");
 foreach ($tab_annees as $key => $value) {
     recupSimple($cnx_mysql, $cnx, "elp_chg_typ_heu", queryTableChargeTypEns($value));
 }
 
-//modif oct. 2014 suite patch apogee 4.50
 requete($cnx_mysql, "DELETE FROM type_heure");
 recupSimple($cnx_mysql, $cnx, "type_heure", queryTableTypHeure());
 

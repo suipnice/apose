@@ -13,7 +13,7 @@
  */
 
 session_start();
-if ($_SESSION['authen'] !== 'ok') {
+if (isset($_SESSION["authen"]) === false or $_SESSION["authen"] !== 'ok') {
     session_destroy();
     echo '<meta http-equiv="Refresh" content="0;url=index.php">';
 } else {
@@ -28,8 +28,7 @@ if ($_SESSION['authen'] !== 'ok') {
                     Consultation de la structure des enseignements APOGEE
                 </h1>
 
-                <div style="border: 1px solid gray"
-                     class="container is-max-desktop p-4 mt-6">
+                <div style="border: 1px solid gray" class="container is-max-desktop p-4 mt-6">
                     <p class="has-text-centered">
                         Veuillez sélectionner l’année et une composante :
                     </p>
@@ -48,7 +47,11 @@ if ($_SESSION['authen'] !== 'ok') {
                                             $sql = "SELECT cod_anu FROM annee_uni";
                                             $res = mysqli_query($link, $sql);
                                             $i = 0;
-                                            while ($enr = mysqli_fetch_array($res)) {
+                                            while (
+                                                is_array(
+                                                    $enr = mysqli_fetch_array($res)
+                                                ) === true
+                                            ) {
                                                 $i++;
                                                 echo "<option value='" . $enr[0] . "'
                                                     >" . $enr[0] . "</option>";
@@ -68,8 +71,7 @@ if ($_SESSION['authen'] !== 'ok') {
                             <div class="field-body">
                                 <div class="field">
                                     <div class="select">
-                                        <select name="Liste_Comp"
-                                                id="Liste_Comp" required="">
+                                        <select name="Liste_Comp" id="Liste_Comp" required="">
                                             <option value="">
                                                 Sélectionnez une composante</option>
                                             <?php
@@ -78,7 +80,11 @@ if ($_SESSION['authen'] !== 'ok') {
                                                     FROM composante
                                                     ORDER BY lib_cmp";
                                             $res = mysqli_query($link, $sql);
-                                            while ($enr = mysqli_fetch_array($res)) {
+                                            while (
+                                                is_array(
+                                                    $enr = mysqli_fetch_array($res)
+                                                ) === true
+                                            ) {
                                                 echo "<option value='" . $enr[1] . "'
                                                      >" . $enr[0] . "</option>";
                                             }
@@ -98,8 +104,7 @@ if ($_SESSION['authen'] !== 'ok') {
                             <div class="field-body">
                                 <div class="field">
                                     <div class="control">
-                                        <input class="bouton-submit" type="submit"
-                                               value="Consulter">
+                                        <input class="bouton-submit" type="submit" value="Consulter">
                                     </div>
                                 </div>
                             </div>
@@ -112,25 +117,21 @@ if ($_SESSION['authen'] !== 'ok') {
                     obtenue, il vous suffit :
                     <ul>
                         <li>de sélectionner l'ensemble du document
-                            <span class="icon has-text-info"><i
-                                  class="fas fa-mouse-pointer"
-                                  aria-hidden="true"></i>
-                            </span></li>
+                            <span class="icon has-text-info"><i class="fas fa-mouse-pointer" aria-hidden="true"></i>
+                            </span>
+                        </li>
                         <li>de le copier
-                            <span class="icon has-text-info"><i
-                                  class="fas fa-copy"
-                                  aria-hidden="true"></i></span></li>
+                            <span class="icon has-text-info"><i class="fas fa-copy" aria-hidden="true"></i></span>
+                        </li>
                         <li>et de le coller dans un nouveau document
                             Excel (Microsoft Office) ou Calc (OpenOffice)
-                            <span class="icon has-text-info"><i
-                                  class="fas fa-file-excel"
-                                  aria-hidden="true"></i></span></li>
+                            <span class="icon has-text-info"><i class="fas fa-file-excel" aria-hidden="true"></i></span>
+                        </li>
                     </ul>
 
-                    <p><a href="./documentation/Guide_utilisateur_apose.pdf"
-                          target="_blank" class="button is-ghost"><i
-                        class="fas fa-book" aria-hidden="true"></i>&nbsp;Accéder
-                        à la documentation (PDF)</a>
+                    <p><a href="./documentation/Guide_utilisateur_apose.pdf" target="_blank" class="button is-ghost"><i
+                                class="fas fa-book" aria-hidden="true"></i>&nbsp;Accéder
+                            à la documentation (PDF)</a>
                     </p>
                 </div>
                 <div class="block has-text-centered pt-3">

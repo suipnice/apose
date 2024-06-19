@@ -13,6 +13,20 @@
  */
 require "../param.php";
 
+/**
+ * Get param from POST and ensure it's an int, with specified default value
+ *
+ * @param string $param   The param to get
+ * @param int    $default The default value
+ *
+ * @return int the param value
+ */
+function getPostInt($param, $default = 0)
+{
+    $def = array('options' => array('default' => $default));
+    return filter_input(INPUT_POST, $param, FILTER_VALIDATE_INT, $def);
+}
+
 
 /**
  * Authentification auprès d'un serveur CAS + LDAP
@@ -21,23 +35,20 @@ require "../param.php";
  */
 function authentificationCAS()
 {
-    // import de la librairie CAS
-    include_once "CAS.php";
-    // import des paramètres du serveur CAS
+    // Import de la librairie CAS
+    include_once "../CAS.php";
+    // Import des paramètres du serveur CAS
     global $connexionCAS;
     global $logoutCas;
 
+    // Initialisation phpCAS
     $phpCAS = new phpCAS();
-    // initialisation phpCAS
     if ($connexionCAS !== "active") {
-        $config_CAS_host = CAS_HOST;
-        $config_CAS_portNumber = CAS_PORT;
-        $config_CAS_URI = CAS_URI;
         $phpCAS->client(
             CAS_VERSION_2_0,
-            $config_CAS_host,
-            $config_CAS_portNumber,
-            $config_CAS_URI
+            CAS_HOST,
+            CAS_PORT,
+            CAS_URI
         );
         $connexionCAS = "active";
     }
@@ -57,8 +68,8 @@ function authentificationCAS()
     $statut = identificationLDAP($usernameCAS);
 
     return $statut;
+} //end authentification_CAS()
 
-}
 
 /**
  * Identification auprès d’un serveur LDAP
@@ -74,13 +85,14 @@ function identificationLDAP($login)
     $baseDN = LDAP_BASE_DN;
     $ldapServer = LDAP_SERVEUR;
 
-    /* mot clef de la recherche*/
+    // Mot clef de la recherche.
     $keyword = $login;
 
-    // Connexion au serveur
+    // Connexion au serveur.
     $conn = ldap_connect($ldapServer);
 
-    /* 2ème étape : on effectue une liaison au serveur, ici de type "anonyme"
+    /*
+     * 2ème étape : on effectue une liaison au serveur, ici de type "anonyme"
      * pour une recherche permise par un accès en lecture seule
      */
     // On dit qu'on utilise LDAP V3, sinon la V2 par défaut est utilisé
@@ -88,36 +100,36 @@ function identificationLDAP($login)
     ldap_set_option($conn, LDAP_OPT_PROTOCOL_VERSION, 3);
 
     // Instruction de liaison.
-    // Connexion Manager
+    // Connexion Manager.
     ldap_bind($conn, LDAP_BIND_RDN, LDAP_BIND_PWD);
 
-    /* 3ème étape : on effectue une recherche avec le dn de base */
+    // 3ème étape : on effectue une recherche avec le dn de base.
     $query = "(&(uid=" . $keyword . "))";
     $result = ldap_search($conn, $baseDN, $query);
 
-    // Lecture du resultat
+    // Lecture du resultat.
     $info = ldap_get_entries($conn, $result);
 
     for ($i = 0; $i < $info["count"]; $i++) {
-
         $uid = $info[$i]["uid"][0];
         $supannetuid = $info[$i]["supannetuid"][0];
         $mail = $info[$i]["mail"][0];
         $username = $info[$i]["cn"][0];
-        $edupersonprimaryaffiliation = $info[$i]["edupersonprimaryaffiliation"][0];
+        $prim_affiliation = $info[$i]["edupersonprimaryaffiliation"][0];
 
         $_SESSION['login'] = $uid;
         $_SESSION['supannetuid'] = $supannetuid;
         $_SESSION['mail'] = $mail;
         $_SESSION['username'] = $username;
-        $_SESSION['statut'] = $edupersonprimaryaffiliation;
+        $_SESSION['statut'] = $prim_affiliation;
     }
 
-    /* 4ème étape : cloture de la session LDAP */
+    // Cloture de la session LDAP.
     ldap_close($conn);
 
-    return $edupersonprimaryaffiliation;
+    return $prim_affiliation;
 }
+
 
 /**
  * Connexion à une base MySQL
@@ -136,14 +148,14 @@ function connexionMysql(
     $passwd_mysql = PASSWD_MYSQL
 ) {
     $link = mysqli_connect($hote_mysql, $user_mysql, $passwd_mysql, $base_mysql);
-    /* Vérification de la connexion */
-    if (mysqli_connect_errno()) {
-        printf("Échec de la connexion : %s\n", mysqli_connect_error());
-        exit();
-    } else {
+    // Vérification de la connexion.
+    if (mysqli_connect_errno() === 0) {
         return $link;
     }
+    printf("Échec de la connexion : %s\n", mysqli_connect_error());
+    exit();
 }
+
 
 /**
  * Performs a query on the database
@@ -158,21 +170,20 @@ function requete($cnx_mysql, $libreq, $debug = 0)
 {
     debug($libreq);
     $req = mysqli_query($cnx_mysql, $libreq);
-    if ($debug) {
+    if ($debug !== 0) {
         echo $libreq . '<br><br>';
     }
 
-    if ($req) {
+    if ($req !== false) {
         return $req;
-    } else {
-        $erreur = "\nErreur requete\n";
-        $erreur .= $libreq . "\n" . MYSQLI_ERROR($cnx_mysql) . "\n"; // pour le debug
-
-        echo $erreur;
-        die('UNE ERREUR A ETE RENCONTREE\n ');
     }
-}
+    $erreur = "\nErreur requete\n";
+    // Pour le debug.
+    $erreur .= $libreq . "\n" . MYSQLI_ERROR($cnx_mysql) . "\n";
 
+    echo $erreur;
+    die('UNE ERREUR A ÉTÉ RENCONTRÉE\n ');
+}
 
 
 /**
@@ -193,11 +204,13 @@ function etpLse($cnx_mysql, $cod_etp_cible, $cod_vrs_vet)
             AND vet_regroupe_lse.cod_lse=liste_elp.cod_lse";
     debug("Récuperation des listes elp pour une version etape.");
     $req = requete($cnx_mysql, $reqetp_lse);
-    while ($r = mysqli_fetch_assoc($req)) {
-        $res[] = $r['cod_lse'];
+    $res = [];
+    while (is_array($fetched = mysqli_fetch_assoc($req)) === true) {
+        $res[] = $fetched['cod_lse'];
     }
     return $res;
 }
+
 
 /**
  * Recuperation des elp fils d'une liste d'une version d'etape
@@ -227,8 +240,8 @@ function chercheElpFils(
     $res = "";
     $tabulation1 = "";
     $tabulation2 = "";
-    $c1 = "";
-    $c2 = "";
+    $cod1 = "";
+    $cod2 = "";
     // Libelle Annexe Descriptive du Diplome
     $ladd = filter_input(INPUT_POST, 'ladd');
     $charge = filter_input(INPUT_POST, 'charge'); // Charge d'enseignement
@@ -251,8 +264,8 @@ function chercheElpFils(
         $tag = "span";
         $tabulation1 = "";
         $res .= "<ul type='none'>";
-        $c1 = "[";
-        $c2 = "]";
+        $cod1 = "[";
+        $cod2 = "]";
     }
 
     $etp = $_SESSION['cod_etp_cible'];
@@ -279,11 +292,11 @@ function chercheElpFils(
     );
     $i = 0;
 
-    while ($r = mysqli_fetch_assoc($req)) {
-        $cod_elp = $r['cod_elp'];
-        $cod_nel = $r['cod_nel'];
-        $cod_pel = $r['cod_pel'];
-        $nbr_crd_elp = $r['nbr_crd_elp'];
+    while (is_array($fetched = mysqli_fetch_assoc($req)) === true) {
+        $cod_elp = $fetched['cod_elp'];
+        $cod_nel = $fetched['cod_nel'];
+        $cod_pel = $fetched['cod_pel'];
+        $nbr_crd_elp = $fetched['nbr_crd_elp'];
 
         // Recuperation nb IP de l'elp
         $reqnbip = requete(
@@ -294,7 +307,7 @@ function chercheElpFils(
                 AND table_elp_nbetu.cod_etp = '$etp'
                 AND table_elp_nbetu.cod_vrs_etp = '$cod_vrs_vet'"
         );
-        while ($rnbip = mysqli_fetch_assoc($reqnbip)) {
+        while (is_array($rnbip = mysqli_fetch_assoc($reqnbip)) === true) {
             $elp_nbetu = $rnbip['nb_etu_ip'];
         }
 
@@ -303,14 +316,14 @@ function chercheElpFils(
             $i++;
             // Ne faire apparaitre l'ADD que pour les élements SEM et UE
             if ($cod_nel === "UE" or $cod_nel === "SE") {
-                $lib_elp = $r['lib_elp'] . "<br>
-                    <span class='lib-add'>" . $r['lib_elp_lng'] . "</span>";
+                $lib_elp = $fetched['lib_elp'] . "<br>
+                    <span class='lib-add'>" . $fetched['lib_elp_lng'] . "</span>";
             } else {
-                $lib_elp = $r['lib_elp'];
+                $lib_elp = $fetched['lib_elp'];
             }
         } else { // sans ADD
             $i++;
-            $lib_elp = $r['lib_elp'];
+            $lib_elp = $fetched['lib_elp'];
         } //Fin if ladd
 
         if ($type <> "tableau") {
@@ -365,7 +378,7 @@ function chercheElpFils(
                     }
                 } else {
                     $index = 0;
-                    while ($enrcharge = mysqli_fetch_array($rescharge)) {
+                    while (is_array($enrcharge = mysqli_fetch_array($rescharge)) === true) {
                         while (
                             strcmp($enrcharge['COD_TYP_HEU'], $entetes[$index]) != 0
                         ) {
@@ -384,7 +397,7 @@ function chercheElpFils(
             }
 
             $res .= "$tabulation1 $lib_niveau $tag1$lib_elp$tag2
-                     $tabulation2 <$tag rel='cod_elp'> $c1$cod_elp$c2 </$tag>
+                     $tabulation2 <$tag rel='cod_elp'> $cod1$cod_elp$cod2 </$tag>
                      <$tag rel='cod_nel'>$cod_nel</$tag>
                      <$tag rel='cod_pel'>$cod_pel</$tag>
                      <$tag rel='nb_crd_elp'>$nbr_crd_elp</$tag>
@@ -395,10 +408,9 @@ function chercheElpFils(
 
         $lib_liste_filles = "";
         $t_liste_lse_filles = array();
-
-        while ($r2 = mysqli_fetch_assoc($req2)) {
-            $t_liste_lse_filles[] = $r2;
-            $lib_liste_filles .= "[" . implode("|", $r2) . "]";
+        while (is_array($fetch2 = mysqli_fetch_assoc($req2)) === true) {
+            $t_liste_lse_filles[] = $fetch2;
+            $lib_liste_filles .= "[" . implode("|", $fetch2) . "]";
         }
 
         $cod_elp_regroupe = "";
@@ -416,7 +428,7 @@ function chercheElpFils(
 
         // desc = 1 si il y a des fils/filles
         if ($desc === 1) {
-            foreach ($t_liste_lse_filles as $k => $r2) {
+            foreach ($t_liste_lse_filles as $key => $r2) {
                 $max = $r2['nbr_max_elp_obl_chx'];
                 $min = $r2['nbr_min_elp_obl_chx'];
                 $cod_lse_aff = $r2['cod_lse'];
@@ -469,7 +481,7 @@ function chercheElpFils(
                         ORDER BY epr_sanctionne_elp.cod_ses,
                                  epreuve.lib_epr, epreuve.cod_epr"
                     );
-                    while ($repr = mysqli_fetch_array($reqepr)) {
+                    while (is_array($repr = mysqli_fetch_array($reqepr)) === true) {
                         $res .= "<tr class='sess-" . $repr[4] . "'>
                             <td>$tabulation1$tabulation1
                             &nbsp;&nbsp;&nbsp;&nbsp;" . $repr[1] . "</td>
@@ -506,7 +518,7 @@ function chercheElpFils(
                         $r2['cod_lse'],
                         $niveau + 1,
                         $type,
-                        $numero,
+                        $numero
                     ) . "";
                 }
             }
@@ -567,6 +579,7 @@ function chercheElpFils(
     }
     return $res;
 }
+
 
 /**
  * Print debug of a mixed value

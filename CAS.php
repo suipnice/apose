@@ -616,10 +616,10 @@ class phpCAS
         global $PHPCAS_DEBUG;
 
         $PHPCAS_DEBUG['indent']--;
-        $dbg = debug_backtrace();
+        debug_backtrace();
         $str = '';
         if (is_object($res)) {
-            $str .= '<= ' . get_class($arg);
+            $str .= '<= ' . get_class($res);
         } else {
             $str .= '<= ' . str_replace(array("\r\n", "\n", "\r"), "", var_export($res, true));
         }

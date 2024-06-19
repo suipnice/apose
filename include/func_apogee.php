@@ -35,6 +35,7 @@ function connexionOracle(
     die("Connexion $base_oracle impossible " . $err['message'] . "\n");
 }
 
+
 /**
  * [Description for queryTableEtape]
  *
@@ -62,6 +63,7 @@ GROUP BY APOGEE.INS_ADM_ETP.COD_ANU,APOGEE.INS_ADM_ETP.COD_ETP,
          APOGEE.INS_ADM_ETP.COD_CMP";
     return $query;
 }
+
 
 /**
  * [Description for queryEtape]
@@ -94,6 +96,7 @@ GROUP BY APOGEE.VDI_FRACTIONNER_VET.COD_ETP,
     return $query;
 }
 
+
 /**
  * [Description for queryAnneeUniApo]
  *
@@ -106,6 +109,7 @@ FROM APOGEE.ANNEE_UNI
 where ETA_ANU_IAE='O'";
     return $query;
 }
+
 
 /**
  * [Description for queryAnneeUniApoOuverte]
@@ -121,6 +125,7 @@ WHERE cod_anu>=(
     return $query;
 }
 
+
 /**
  * [Description for queryEpreuve]
  *
@@ -133,6 +138,7 @@ FROM APOGEE.EPREUVE";
     return $query;
 }
 
+
 /**
  * [Description for queryEprSanctionneElp]
  *
@@ -144,6 +150,7 @@ function queryEprSanctionneElp()
 FROM APOGEE.EPR_SANCTIONNE_ELP where TEM_SUS_EPR_SES = 'N'";
     return $query;
 }
+
 
 /**
  * [Description for queryComposante]
@@ -158,6 +165,7 @@ and cod_rne_cmp is not null";
     //AND APOGEE.COMPOSANTE.COD_NAT_CMP = 'J'";
     return $query;
 }
+
 
 /**
  * [Description for queryTableEtapeNbetu]
@@ -184,6 +192,7 @@ GROUP BY APOGEE.INS_ADM_ETP.COD_ANU,APOGEE.INS_ADM_ETP.COD_ETP,
     return $query;
 }
 
+
 /**
  * [Description for queryTableElpNbetu]
  *
@@ -207,6 +216,7 @@ GROUP BY APOGEE.IND_CONTRAT_ELP.COD_ANU,
     return $query;
 }
 
+
 /**
  * [Description for queryVetRegrLse]
  *
@@ -221,6 +231,7 @@ function queryVetRegrLse()
     return $query;
 }
 
+
 /**
  * [Description for queryElpRegroupeLse]
  *
@@ -234,6 +245,7 @@ function queryElpRegroupeLse()
     return $query;
 }
 
+
 /**
  * [Description for queryListes]
  *
@@ -245,6 +257,8 @@ function queryListes()
 FROM APOGEE.liste_elp ";
     return $query;
 }
+
+
 /**
  * [Description for queryLseRegroupeElp]
  *
@@ -256,6 +270,7 @@ function queryLseRegroupeElp()
 FROM APOGEE.lse_regroupe_elp";
     return $query;
 }
+
 
 /**
  * [Description for queryTableElp]
@@ -286,6 +301,7 @@ function queryTableElp()
     return $query;
 }
 
+
 /**
  * [Description for queryTableElpChargeEns]
  *
@@ -306,6 +322,7 @@ AND APOGEE.ELP_CHARGE_ENS.TEM_CAL_CHG = 'O'";
     return $query;
 }
 
+
 /**
  * [Description for queryTableChargeTypEns]
  *
@@ -324,6 +341,7 @@ function queryTableChargeTypEns($year)
     return $query;
 }
 
+
 /**
  * [Description for queryTableTypHeure]
  *
@@ -338,6 +356,7 @@ function queryTableTypHeure()
     WHERE APOGEE.TYPE_HEURE.TEM_EN_SVE_TYP_HEU = 'O'";
     return $query;
 }
+
 
 /**
  * [Description for recupSimple]
@@ -364,18 +383,19 @@ function recupSimple(
     $result = oci_execute($cursor);
     oci_fetch_all($cursor, $result);
 
-    if ($cursor and $result) {
+    if ($cursor !== false and $result === true ) {
         $result = oci_execute($cursor);
         requete($cnx_mysql, "lock tables $nom_table_mysql write");
 
-        while ($row = oci_fetch_object($cursor) === true) {
+        while ($row = oci_fetch_object($cursor) !== false) {
             $sql = "'";
 
             foreach ($row as $cle => $valeur) {
                 $valeur = str_replace(",", ".", $valeur);
                 $sql .= str_replace("'", "\\'", $valeur) . "','";
             }
-            $sql = substr($sql, 0, -2); /* Enleve les 2 caracteres à la fin (,') */
+            // Enleve les 2 caracteres à la fin (,').
+            $sql = substr($sql, 0, -2);
 
             $req_insert_sql = "INSERT INTO " . $nom_table_mysql . "
                                VALUES(" . $sql . ")";

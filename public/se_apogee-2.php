@@ -12,7 +12,7 @@
  * @link     https://git.unice.fr/dsi-sen/apose
  */
 session_start();
-if ($_SESSION["authen"] !== 'ok') {
+if (isset($_SESSION["authen"]) === false or $_SESSION["authen"] !== 'ok') {
     session_destroy();
     echo '<meta http-equiv="Refresh" content="0;url=index.php">';
 } else {
@@ -27,7 +27,6 @@ if ($_SESSION["authen"] !== 'ok') {
     $cpt = 0;
 
     if (empty($_POST) === false) {
-
         $RefEtp = filter_input(INPUT_POST, "RefEtp");
         $type = filter_input(INPUT_POST, "type");
         $numero = filter_input(INPUT_POST, "numero");
@@ -53,7 +52,7 @@ if ($_SESSION["authen"] !== 'ok') {
         $_SESSION['cod_etp_cible'] = $cod_etp_cible;
         $_SESSION['cod_vrs_vet'] = $cod_vrs_vet;
 
-        $r = mysqli_fetch_assoc(
+        $fetched = mysqli_fetch_assoc(
             requete(
                 $cnx_mysql,
                 "SELECT *
@@ -63,7 +62,7 @@ if ($_SESSION["authen"] !== 'ok') {
             )
         );
 
-        $lib_etp = $r['lib_etp'];
+        $lib_etp = $fetched['lib_etp'];
         $res2 .= "";
         $res2 .= "
         <p>État de la modélisation APOGEE :
@@ -123,9 +122,11 @@ if ($_SESSION["authen"] !== 'ok') {
             $nbchg = mysqli_num_rows($resentetes);
             if ($nbchg > 0) {
                 $index = 0;
-                while ($rowchg = mysqli_fetch_array($resentetes)) {
+                while (
+                    is_array($rowchg = mysqli_fetch_array($resentetes)) === true
+                ) {
                     $libcharge .= "<th scope='col'>Charges Ens<br>
-                        ".$rowchg['COD_TYP_HEU'] . "</th>";
+                        " . $rowchg['COD_TYP_HEU'] . "</th>";
                     $entetes[$index] = $rowchg['COD_TYP_HEU'];
                     $index = $index + 1;
                 }
@@ -135,7 +136,7 @@ if ($_SESSION["authen"] !== 'ok') {
             $nbchg = 0;
         }
 
-        foreach ($t_etp_lse as $k => $cod_lse) {
+        foreach ($t_etp_lse as $key => $cod_lse) {
             $niveau = 1;
             $req = requete(
                 $cnx_mysql,
@@ -162,7 +163,7 @@ if ($_SESSION["authen"] !== 'ok') {
                 $res2 .= '</a></div>';
                 $res2 .= "<table id='arbo2'
                     class='table is-striped is-hoverable is-fullwidth'>";
-                $res2 .= "<caption>$cod_lse"." : $lib_liste</caption>";
+                $res2 .= "<caption>$cod_lse" . " : $lib_liste</caption>";
                 if ($_SESSION['epr'] === 1) {
                     $libses = "<br>/ Session";
                 } else {

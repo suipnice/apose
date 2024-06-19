@@ -16,18 +16,18 @@ require "../include/fonctions.php";
 
 // On vérifie si la variable de session du profil est définie,
 // sinon on demande une authentification CAS.
-if (!isset($_SESSION['authen'])) {
+if (isset($_SESSION['authen']) === false) {
     $statut = authentificationCAS();
-    $authorized = array(
+    $authorized = [
         "staff",
         "teacher",
         "faculty",
         "researcher",
         "employee"
-    );
+    ];
     if (in_array($statut, $authorized)) {
         $_SESSION['authen'] = "ok";
-        //redirection
+        // Redirection.
         echo '<meta http-equiv="Refresh" content="0;url=comp.php">';
     } else {
         $user = phpCAS::getUser();

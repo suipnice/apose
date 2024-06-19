@@ -13,7 +13,7 @@
  */
 session_start();
 $authen = $_SESSION["authen"];
-if (!$_SESSION["authen"] !== 'ok') {
+if ($_SESSION["authen"] !== 'ok') {
     session_destroy();
     echo '<meta http-equiv="Refresh" content="0;url=index.php">';
 } else {
@@ -34,17 +34,15 @@ if (!$_SESSION["authen"] !== 'ok') {
     $cod_anu = filter_input(INPUT_POST, "cod_anu");
 
     // Memorisation et prise en compte du choix des boutons radios lors du retour
-    $def_zero=array('options'=>array('default'=>'0'));
-    $def_one=array('options'=>array('default'=>'1'));
+    $radio_numero = getPostInt('numero');
+    $radio_ladd = getPostInt('ladd');
+    $radio_charge = getPostInt('charge');
 
-    $radio_numero = filter_input(INPUT_POST, 'numero', FILTER_DEFAULT, $def_zero);
-    $radio_ladd = filter_input(INPUT_POST, 'ladd', FILTER_DEFAULT, $def_zero);
-    $radio_charge = filter_input(INPUT_POST, 'charge', FILTER_DEFAULT, $def_zero);
+    $def_zero = array('options' => array('default' => 0));
+    $def_one = array('options' => array('default' => 1));
 
-    $radio_epr = filter_var($_SESSION['epr'], FILTER_DEFAULT, $def_zero);
-    $radio_ses = filter_var($_SESSION['cod_ses'], FILTER_DEFAULT, $def_one);
-    $res2 .= "<pre class='debug'>authen=$authen</pre>";
-    $res2 .= "<pre class='debug'>radio_EPR=$radio_epr</pre>";
+    $radio_epr = filter_var($_SESSION['epr'], FILTER_VALIDATE_INT, $def_zero);
+    $radio_ses = filter_var($_SESSION['cod_ses'], FILTER_VALIDATE_INT, $def_one);
     $res2 .= "<h3>Liste des années d’études disponibles sur APOGEE :</h3>";
 
     $res3 .= "<hr><h3>Liste des années d’études non modélisées sur APOGEE :</h3>";
@@ -71,7 +69,7 @@ if (!$_SESSION["authen"] !== 'ok') {
     $table_headers2 .= '</tr></thead><tbody>';
 
     $rescycle = requete($cnx_mysql, $reqcycle);
-    while ($enrcycle = mysqli_fetch_array($rescycle)) {
+    while (is_array($enrcycle = mysqli_fetch_array($rescycle)) === true) {
 
         $reqetape = "SELECT etape.cod_etp,etape.cod_vrs_vet,
                     etape.lic_etp,etape.lib_etp,
@@ -107,14 +105,14 @@ if (!$_SESSION["authen"] !== 'ok') {
         $res2 .= $table_headers;
         $res3 .= $table_headers2;
 
-        while ($r = mysqli_fetch_assoc($req)) {
+        while (is_array($fetched = mysqli_fetch_assoc($req)) === true) {
             $cpt = $cpt + 1;
-            $cod_etp = $r['cod_etp'];
-            $lib_etp = $r['lib_etp'];
-            $cod_vrs_vet = $r['cod_vrs_vet'];
-            $deb_rec = $r['DAA_DEB_RCT_VET'];
-            $fin_rec = $r['DAA_FIN_RCT_VET'];
-            if ($r['cod_lse'] !== '') {
+            $cod_etp = $fetched['cod_etp'];
+            $lib_etp = $fetched['lib_etp'];
+            $cod_vrs_vet = $fetched['cod_vrs_vet'];
+            $deb_rec = $fetched['DAA_DEB_RCT_VET'];
+            $fin_rec = $fetched['DAA_FIN_RCT_VET'];
+            if ($fetched['cod_lse'] !== '') {
                 $res2 .= "<tr><td>
                     <input type=\"radio\" name=\"RefEtp\"
                         id='$cod_etp$cod_vrs_vet'
@@ -140,14 +138,14 @@ if (!$_SESSION["authen"] !== 'ok') {
                 AND cod_cmp='" . $comp . "'";
             $resetu = mysqli_query($cnx_mysql, $sqletu);
             if (mysqli_num_rows($resetu) === 0) {
-                if ($r['cod_lse'] !== '') {
+                if ($fetched['cod_lse'] !== '') {
                     $res2 .= "<td> -- </td></tr>";
                 } else {
                     $res3 .= "<td> -- </td></tr>";
                 }
             } else {
-                while ($enretu = mysqli_fetch_array($resetu)) {
-                    if ($r['cod_lse'] !== '') {
+                while (is_array($enretu = mysqli_fetch_array($resetu)) === true) {
+                    if ($fetched['cod_lse'] !== '') {
                         $res2 .= "<td>$enretu[0]</td></tr>";
 
                     } else {
@@ -199,15 +197,15 @@ if (!$_SESSION["authen"] !== 'ok') {
                             <div class="control">
                                 <label class="radio">
                                     <input type="radio" name="numero" value="1" <?php
-                                    if ($radio_numero === '1') {
+                                    if ($radio_numero === 1) {
                                         echo "checked";
-                                    } ?> > Oui
+                                    } ?>> Oui
                                 </label>
                                 <label class="radio">
                                     <input type="radio" name="numero" value="0" <?php
-                                    if ($radio_numero === '0') {
+                                    if ($radio_numero === 0) {
                                         echo "checked";
-                                    } ?> > Non
+                                    } ?>> Non
                                 </label>
                             </div>
                         </div>
@@ -222,16 +220,16 @@ if (!$_SESSION["authen"] !== 'ok') {
                             <div class="control">
                                 <label class="radio">
                                     <input type="radio" name="ladd" value="1" <?php
-                                    if ($radio_ladd === '1') {
+                                    if ($radio_ladd === 1) {
                                         echo "checked";
-                                    } ?> > Oui
+                                    } ?>> Oui
                                 </label>
                                 <label class="radio">
                                     <input type="radio" name="ladd" value="0" <?php
-                                    if ($radio_ladd === '0') {
+                                    if ($radio_ladd === 0) {
                                         echo "checked";
                                     }
-                                    ?> > Non
+                                    ?>> Non
                                 </label>
                             </div>
                         </div>
@@ -244,15 +242,15 @@ if (!$_SESSION["authen"] !== 'ok') {
                             <div class="control">
                                 <label class="radio">
                                     <input type="radio" name="charge" value="1" <?php
-                                    if ($radio_charge === '1') {
+                                    if ($radio_charge === 1) {
                                         echo "checked";
-                                    } ?> > Oui
+                                    } ?>> Oui
                                 </label>
                                 <label class="radio">
                                     <input type="radio" name="charge" value="0" <?php
-                                    if ($radio_charge === '0') {
+                                    if ($radio_charge === 0) {
                                         echo "checked";
-                                    } ?> > Non
+                                    } ?>> Non
                                 </label>
                             </div>
                         </div>
@@ -264,26 +262,22 @@ if (!$_SESSION["authen"] !== 'ok') {
                         <div class="field-body">
                             <div class="control">
                                 <label class="radio">
-                                    <input type="radio" class="session"
-                                           name="epr" id="epr-1" value="1"
-                                        <?php
-                                        if ($radio_epr === '1') {
-                                            echo "checked";
-                                        } ?> > Oui
+                                    <input type="radio" class="session" name="epr" id="epr-1" value="1" <?php
+                                    if ($radio_epr === 1) {
+                                        echo "checked";
+                                    } ?>> Oui
                                 </label>
                                 <label class="radio">
-                                    <input type="radio" class="session"
-                                           name="epr" id="epr-0" value="0"
-                                    <?php
-                                    if ($radio_epr === '0') {
+                                    <input type="radio" class="session" name="epr" id="epr-0" value="0" <?php
+                                    if ($radio_epr === 0) {
                                         echo "checked";
-                                    } ?> > Non
+                                    } ?>> Non
                                 </label>
                             </div>
                         </div>
                     </div>
                     <div id="field-session" class="field is-horizontal <?php
-                    if ($_SESSION['epr'] !== 1) {
+                    if ($radio_epr !== 1) {
                         echo "is-invisible";
                     } ?> ">
                         <div class="field-label">
@@ -292,32 +286,28 @@ if (!$_SESSION["authen"] !== 'ok') {
                         <div class="field-body">
                             <div class="control">
                                 <label class="radio p-2 sess-1">
-                                    <input type="radio" name="cod_ses" value="1"
-                                        <?php
-                                        if ($radio_ses === '1') {
-                                            echo "checked";
-                                        } ?> > 1
+                                    <input type="radio" name="cod_ses" value="1" <?php
+                                    if ($radio_ses === 1) {
+                                        echo "checked";
+                                    } ?>> 1
                                 </label>
                                 <label class="radio p-2 sess-2">
-                                    <input type="radio" name="cod_ses" value="2"
-                                        <?php
-                                        if ($radio_ses === '2') {
-                                            echo "checked";
-                                        } ?> > 2
+                                    <input type="radio" name="cod_ses" value="2" <?php
+                                    if ($radio_ses === 2) {
+                                        echo "checked";
+                                    } ?>> 2
                                 </label>
                                 <label class="radio p-2 sess-0">
-                                    <input type="radio" name="cod_ses" value="0"
-                                        <?php
-                                        if ($radio_ses === '0') {
-                                            echo "checked";
-                                        } ?> > Unique
+                                    <input type="radio" name="cod_ses" value="0" <?php
+                                    if ($radio_ses === 0) {
+                                        echo "checked";
+                                    } ?>> Unique
                                 </label>
                                 <label class="radio p-2">
-                                    <input type="radio" name="cod_ses" value="4"
-                                        <?php
-                                        if ($radio_ses === '4') {
-                                            echo "checked";
-                                        } ?> > Toutes les sessions
+                                    <input type="radio" name="cod_ses" value="4" <?php
+                                    if ($radio_ses === 4) {
+                                        echo "checked";
+                                    } ?>> Toutes les sessions
                                 </label>
                             </div>
                         </div>
