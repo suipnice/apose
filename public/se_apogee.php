@@ -9,11 +9,11 @@
  * @author   2021-2024 - UniCA DSI <dsi.sen@univ-cotedazur.fr>
  * @author   2022 - Université Toulouse 1 Capitole <dsi@univ-tlse1.fr>
  * @license  GNU GPL
- * @link     https://git.unice.fr/dsi-sen/apose
+ * @link     https://github.com/suipnice/apose
  */
 session_start();
-$authen = $_SESSION["authen"];
-if ($_SESSION["authen"] !== 'ok') {
+
+if (isset($_SESSION["authen"]) === false or $_SESSION["authen"] !== 'ok') {
     session_destroy();
     echo '<meta http-equiv="Refresh" content="0;url=index.php">';
 } else {
@@ -23,13 +23,14 @@ if ($_SESSION["authen"] !== 'ok') {
 
     $pdf = "";
     $res = "";
-    // Affichage du nb etape.
-    $res0 = "";
+    // Etapes modélisées dans Apogée.
     $res2 = "";
-    // Liste des Etapes non Modélisées dans Apogée.
+    $cptY = 0;
+    // Etapes NON Modélisées dans Apogée.
     $res3 = "";
+    $cptN = 0;
+
     $adresse = "";
-    $cpt = 0;
 
     // Recupération de la composante et de l'annee.
     $comp = filter_input(INPUT_POST, "Liste_Comp");
@@ -60,13 +61,15 @@ if ($_SESSION["authen"] !== 'ok') {
     $table_headers = '<thead><tr class="bg-primary">';
     $table_headers .= '<th scope="col" class="no-sort">Choix</th>';
     $table_headers .= '<th scope="col">Titre</th>';
-    $table_headers .= '<th scope="col">Recr.</th>';
+    $table_headers .= '<th scope="col">Code VET</th>';
+    $table_headers .= '<th scope="col">Recrutement</th>';
     $table_headers .= '<th scope="col">Nombre d’étudiants inscrits</th>';
     $table_headers .= '</tr></thead>';
 
     $table_headers2 = '<thead><tr class="bg-secondary">';
     $table_headers2 .= '<th scope="col">Titre</th>';
-    $table_headers2 .= '<th scope="col">Recr.</th>';
+    $table_headers2 .= '<th scope="col">Code VET</th>';
+    $table_headers2 .= '<th scope="col">Recrutement</th>';
     $table_headers2 .= '<th scope="col">Nombre d’étudiants inscrits</th>';
     $table_headers2 .= '</tr></thead><tbody>';
 
@@ -108,13 +111,13 @@ if ($_SESSION["authen"] !== 'ok') {
         $res3 .= $table_headers2;
 
         while (is_array($fetched = mysqli_fetch_assoc($req)) === true) {
-            $cpt += 1;
             $cod_etp = $fetched['cod_etp'];
             $lib_etp = $fetched['lib_etp'];
             $cod_vrs_vet = $fetched['cod_vrs_vet'];
             $deb_rec = $fetched['DAA_DEB_RCT_VET'];
             $fin_rec = $fetched['DAA_FIN_RCT_VET'];
-            if ($fetched['cod_lse'] !== '') {
+            if (is_null($fetched['cod_lse']) === false) {
+                $cptY += 1;
                 $res2 .= "<tr><td>
                     <input type=\"radio\" name=\"RefEtp\"
                         id='$cod_etp$cod_vrs_vet'
@@ -124,12 +127,15 @@ if ($_SESSION["authen"] !== 'ok') {
                 $res2 .= "<input type='hidden' name='cycle'
                                  value=" . $enrcycle[0] . ">";
                 $res2 .= "</td>";
-                $res2 .= "<td><label for='$cod_etp$cod_vrs_vet'>
-                    $lib_etp ($cod_etp / $cod_vrs_vet)</label></td>";
+                $res2 .= "<td>
+                    <label for='$cod_etp$cod_vrs_vet'>$lib_etp</label></td>";
+                $res2 .= "<td>$cod_etp-$cod_vrs_vet";
                 $res2 .= "<td>$deb_rec/$fin_rec</td>";
             } else {
+                $cptN += 1;
                 $res3 .= "<tr>";
-                $res3 .= "<td> $lib_etp ($cod_etp / $cod_vrs_vet)</td>";
+                $res3 .= "<td>$lib_etp</td>";
+                $res3 .= "<td>$cod_etp-$cod_vrs_vet</td>";
                 $res3 .= "<td>$deb_rec/$fin_rec</td>";
             }
 
@@ -141,29 +147,25 @@ if ($_SESSION["authen"] !== 'ok') {
                 AND cod_cmp='" . $comp . "'";
             $resetu = mysqli_query($cnx_mysql, $sqletu);
             if (mysqli_num_rows($resetu) === 0) {
-                if ($fetched['cod_lse'] !== '') {
+                if (is_null($fetched['cod_lse']) === false) {
                     $res2 .= "<td> -- </td></tr>";
                 } else {
                     $res3 .= "<td> -- </td></tr>";
                 }
             } else {
                 while (is_array($enretu = mysqli_fetch_array($resetu)) === true) {
-                    if ($fetched['cod_lse'] !== '') {
+                    if (is_null($fetched['cod_lse']) === false) {
                         $res2 .= "<td>$enretu[0]</td></tr>";
                     } else {
                         $res3 .= "<td>$enretu[0]</td></tr>";
                     }
                 }
             }
-
-        } //end while liste etape
-
-    } //end while recup Cycle
+        }//end while liste etape
+    }//end while recup Cycle
 
     $res2 .= "</table></fieldset></form>";
     $res3 .= "</table>";
-    $cpt = 0;
-
     ?>
 
     <div class="container">
@@ -172,7 +174,7 @@ if ($_SESSION["authen"] !== 'ok') {
             // Affichage du libellé de la composante.
             $reqa = requete(
                 $cnx_mysql,
-                "select lib_cmp from composante where cod_cmp='$comp'"
+                "SELECT lib_cmp FROM composante WHERE cod_cmp='$comp'"
             );
             while (is_array($row = mysqli_fetch_row($reqa)) === true) {
                 $lib_comp = $row[0];
@@ -319,7 +321,9 @@ if ($_SESSION["authen"] !== 'ok') {
                 </fieldset>
 
                 <?php
-                echo $res0;
+                $tot = $cptY + $cptN;
+                echo "<p class='mt-2'>
+                    <strong>$tot Étapes (dont $cptY modélisées)</strong></p>";
                 echo $res2;
                 echo $res;
                 echo $res3;
@@ -330,5 +334,6 @@ if ($_SESSION["authen"] !== 'ok') {
 
     <?php
     include "../include/footer.php";
-}
+}//end if authen
+
 ?>

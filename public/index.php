@@ -9,7 +9,7 @@
  * @author   2021-2024 - UniCA DSI SEN <dsi.sen@univ-cotedazur.fr>
  * @author   2022 - Université Toulouse 1 Capitole <dsi@univ-tlse1.fr>
  * @license  GNU GPL
- * @link     https://git.unice.fr/dsi-sen/apose
+ * @link     https://github.com/suipnice/apose
  */
 require_once "../CAS.php";
 require "../include/fonctions.php";
@@ -53,5 +53,5 @@ if (isset($_SESSION['authen']) === false) {
             Contactez votre référent RH de proximité pour en savoir plus.</p>";
         echo "</div></div></div></div>";
         include "../include/footer.php";
-    } // end if authorized status
-} // end if isset(authen)
+    }//end if authorized status
+}//end if isset(authen)

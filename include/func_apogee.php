@@ -9,7 +9,7 @@
  * @author   2021-2024 - UniCA DSI <dsi.sen@univ-cotedazur.fr>
  * @author   2022 - Université Toulouse 1 Capitole <dsi@univ-tlse1.fr>
  * @license  GNU GPL
- * @link     https://git.unice.fr/dsi-sen/apose
+ * @link     https://github.com/suipnice/apose
  */
 
 
@@ -35,7 +35,7 @@ function connexionOracle(
     $err = oci_error();
     die("Connexion $base_oracle impossible " . $err['message'] . "\n");
 
-} // end connexionOracle()
+}//end connexionOracle()
 
 
 /**
@@ -117,16 +117,18 @@ where ETA_ANU_IAE='O'";
 
 
 /**
- * [Description for queryAnneeUniApoOuverte]
+ * Récupère dans Apogée l'année courante, la suivante, ansi que le nombre
+ * d'années précédentes indiquées par le param NB_PREV_YEAR
  *
- * @return [type]
+ * @return string La requete a fournir à Oracle
  */
 function queryAnneeUniApoOuverte()
 {
+    $NB_PREV_YEAR = NB_PREV_YEAR;
     $query = "SELECT cod_anu
-FROM annee_uni
-WHERE cod_anu>=(
-    SELECT cod_anu FROM annee_uni WHERE eta_anu_iae='O')";
+    FROM annee_uni
+    WHERE cod_anu + $NB_PREV_YEAR >=(
+        SELECT cod_anu FROM annee_uni WHERE eta_anu_iae='O')";
     return $query;
 
 }
@@ -154,7 +156,8 @@ FROM APOGEE.EPREUVE";
 function queryEprSanctionneElp()
 {
     $query = "SELECT COD_ELP, COD_EPR, COD_SES
-FROM APOGEE.EPR_SANCTIONNE_ELP where TEM_SUS_EPR_SES = 'N'";
+    FROM APOGEE.EPR_SANCTIONNE_ELP
+    WHERE TEM_SUS_EPR_SES = 'N'";
     return $query;
 
 }
@@ -168,8 +171,8 @@ FROM APOGEE.EPR_SANCTIONNE_ELP where TEM_SUS_EPR_SES = 'N'";
 function queryComposante()
 {
     $query = "SELECT COD_CMP, LIB_CMP, INT_1_EDI_DIP_CMP
-FROM APOGEE.COMPOSANTE WHERE TEM_EN_SVE_CMP = 'O'
-and cod_rne_cmp is not null";
+    FROM APOGEE.COMPOSANTE WHERE TEM_EN_SVE_CMP = 'O'
+    AND cod_rne_cmp IS NOT NULL";
     // AND APOGEE.COMPOSANTE.COD_NAT_CMP = 'J'";
     return $query;
 
@@ -349,12 +352,12 @@ AND APOGEE.ELP_CHARGE_ENS.TEM_CAL_CHG = 'O'";
  */
 function queryTableChargeTypEns($year)
 {
-    $query = "SELECT APOGEE.ELP_CHG_TYP_HEU.COD_ELP,
-        APOGEE.ELP_CHG_TYP_HEU.COD_ANU,
-        APOGEE.ELP_CHG_TYP_HEU.COD_TYP_HEU,
-        APOGEE.ELP_CHG_TYP_HEU.NBR_HEU_ELP
+    $query = "SELECT COD_ELP,
+        COD_ANU,
+        COD_TYP_HEU,
+        NBR_HEU_ELP AS NB_HEU_ELP
     FROM APOGEE.ELP_CHG_TYP_HEU
-    WHERE APOGEE.ELP_CHG_TYP_HEU.COD_ANU='$year'";
+    WHERE COD_ANU='$year'";
     return $query;
 
 }
@@ -402,19 +405,35 @@ function recupSimple(
     $result = oci_execute($cursor);
     oci_fetch_all($cursor, $result);
 
-    if ($cursor !== false and $result === true) {
+    if ($cursor !== false and is_array($result) === true) {
         $result = oci_execute($cursor);
         requete($cnx_mysql, "lock tables $nom_table_mysql write");
 
-        while ($row = oci_fetch_object($cursor) !== false) {
+        while (is_object($row = oci_fetch_object($cursor)) === true) {
             $sql = "'";
-
+            $keys = [];
             foreach ($row as $cle => $valeur) {
                 $valeur = str_replace(",", ".", $valeur);
-                $sql .= str_replace("'", "\\'", $valeur) . "','";
+
+                // Colonnes qui doivent numériques plutôt que chaine vide ''
+                $num_cols = ["NBR_VOL_ELP", "NB_HEU_ELP"];
+                if (in_array($cle, $num_cols) and $valeur === '') {
+                    $valeur = 0;
+                }
+
+                // Colonnes qui doivent être NULL plutot que ''
+                if (in_array($cle, ["NB_HEU"]) and $valeur === '') {
+                    /* Retire "'" à la fin */
+                    $sql = substr($sql, 0, -1);
+                    $sql .= "NULL,'";
+                } else {
+                    $sql .= str_replace("'", "\\'", $valeur) . "','";
+                }
+                $keys[] = $cle;
             }
             // Enleve les 2 caracteres à la fin (,').
             $sql = substr($sql, 0, -2);
+            $keys = implode(",", $keys);
 
             $req_insert_sql = "INSERT INTO " . $nom_table_mysql . "
                                VALUES(" . $sql . ")";
@@ -424,9 +443,11 @@ function recupSimple(
 
         requete($cnx_mysql, "unlock tables");
     } else {
+        $e = oci_error();
+        echo "cursor = '$cursor' // result = $result";
         die(
             "Erreur Requete ORACLE \n$lib_query\n
-            " . print_r(oci_error($cursor)) . "\n"
+            " . print_r($e['message']) . "\n"
         );
-    } //end if
+    }//end if
 }

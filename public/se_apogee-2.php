@@ -9,7 +9,7 @@
  * @author   2021-2024 - UniCA DSI <dsi.sen@univ-cotedazur.fr>
  * @author   2022 - Université Toulouse 1 Capitole <dsi@univ-tlse1.fr>
  * @license  GNU GPL
- * @link     https://git.unice.fr/dsi-sen/apose
+ * @link     https://github.com/suipnice/apose
  */
 session_start();
 if (isset($_SESSION["authen"]) === false or $_SESSION["authen"] !== 'ok') {
@@ -76,11 +76,12 @@ if (isset($_SESSION["authen"]) === false or $_SESSION["authen"] !== 'ok') {
             $res2 .= '<div class="column">';
             if ($cod_ses === 0) {
                 $res2 .= 'Épreuves : <strong>Session Unique</strong>';
-            } elseif ($cod_ses === 4) {
+            } else if ($cod_ses === 4) {
                 $res2 .= 'Épreuves : <strong>toutes sessions</strong>';
             } else {
                 $res2 .= "Épreuves : <strong>Session $cod_ses</strong>";
             }
+
             $res2 .= "</div><div class='column'>";
             $res2 .= '<p>Légende :</p><ul>';
             if ($cod_ses === 1 || $cod_ses === 4) {
@@ -94,7 +95,7 @@ if (isset($_SESSION["authen"]) === false or $_SESSION["authen"] !== 'ok') {
             }
             $res2 .= '</ul>';
             $res2 .= "</div></div>";
-        } // end if aff_epr == 1
+        }//end if aff_epr == 1
 
         $t_etp_lse = etpLse($cnx_mysql, $cod_etp_cible, $cod_vrs_vet);
 
@@ -136,7 +137,7 @@ if (isset($_SESSION["authen"]) === false or $_SESSION["authen"] !== 'ok') {
         } else {
             $libcharge = "";
             $nbchg = 0;
-        }
+        }//end if charge == 1
 
         foreach ($t_etp_lse as $key => $cod_lse) {
             $niveau = 1;
@@ -146,8 +147,8 @@ if (isset($_SESSION["authen"]) === false or $_SESSION["authen"] !== 'ok') {
                     vet_regroupe_lse.nbr_max_elp_obl_chx,
                     vet_regroupe_lse.nbr_min_elp_obl_chx
                  FROM vet_regroupe_lse,liste_elp
-                 where vet_regroupe_lse.cod_lse = liste_elp.cod_lse
-                 and liste_elp.cod_lse='$cod_lse'"
+                 WHERE vet_regroupe_lse.cod_lse = liste_elp.cod_lse
+                 AND liste_elp.cod_lse='$cod_lse'"
             );
             while (is_array($row = mysqli_fetch_row($req)) === true) {
                 $lib_liste = $row[1];
@@ -165,15 +166,20 @@ if (isset($_SESSION["authen"]) === false or $_SESSION["authen"] !== 'ok') {
                 $res2 .= '</a></div>';
                 $res2 .= "<table id='arbo2'
                     class='table is-striped is-hoverable is-fullwidth'>";
-                $res2 .= "<caption>$cod_lse" . " : $lib_liste</caption>";
+                $res2 .= "<caption>$cod_lse&nbsp;: $lib_liste</caption>";
                 if ($aff_epr === 1) {
                     $libses = "<br>/ Session";
                 } else {
                     $libses = "";
                 }
+                if (SYLLABUS_LINK !== "") {
+                    $code_title = "Code (et lien syllabus)";
+                } else {
+                    $code_title = "Code";
+                }
                 $res2 .= "<thead><tr>
                             <th scope='col'>Libellé</th>
-                            <th scope='col'>Code</th>
+                            <th scope='col'>$code_title</th>
                             <th scope='col'>Nature</th>
                             <th scope='col'>Période</th>
                             <th scope='col'>ECTS$libses</th>
@@ -183,7 +189,7 @@ if (isset($_SESSION["authen"]) === false or $_SESSION["authen"] !== 'ok') {
                             <th scope='col'>Observations</th>
                         </tr></thead>";
             } else {
-                $res2 .= "<p>$cod_lse : $lib_liste</p>";
+                $res2 .= "<p>$cod_lse&nbsp;: $lib_liste</p>";
             }
 
             $res_tmp = chercheElpFils(
@@ -206,8 +212,7 @@ if (isset($_SESSION["authen"]) === false or $_SESSION["authen"] !== 'ok') {
                 $res2 .= "</table>";
             }
         }
-
-    }// fin if $_POST
+    }//end if $_POST
     ?>
 
     <div class="container">

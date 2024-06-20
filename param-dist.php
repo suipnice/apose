@@ -9,7 +9,7 @@
  * @author   2021-2024 - UniCA DSI <dsi.sen@univ-cotedazur.fr>
  * @author   2022 - Université Toulouse 1 Capitole <dsi@univ-tlse1.fr>
  * @license  GNU GPL
- * @link     https://git.unice.fr/dsi-sen/apose
+ * @link     https://github.com/suipnice/apose
  */
 
 // Set "YES" for mode test
@@ -45,6 +45,10 @@ DEFINE("BASE_ORACLE", "APOPROD");
 DEFINE("PASSWD_ORACLE", "A_CHANGER");
 DEFINE("USER_ORACLE", "apogee");
 
+// Nombre d'années précédentes à afficher
+// (1 pour l'an passé, 0 pour uniquement l'année courante)
+DEFINE("NB_PREV_YEAR", 1);
+
 // PARAMETRES CAS.
 DEFINE("CAS_HOST", "login.univ.fr");
 DEFINE("CAS_PORT", 443);
@@ -58,3 +62,11 @@ define("LDAP_BIND_RDN", "cn=manager,dc=univ,dc=fr");
 define("LDAP_BIND_PWD", "A_CHANGER");
 
 DEFINE("CHEMIN_PUBLIC", "/var/www/public/");
+
+// Lien vers un syllabus pour les éléments terminaux
+// Il doit contenir les champs [[cod_elp]] et [[cod_anu]],
+// qui seront remplacés par leur valeurs respectives.
+DEFINE(
+    "SYLLABUS_LINK",
+    "https://syllabus.univ.fr/fr/course/router/[[cod_elp]]/[[cod_anu]]"
+);

@@ -9,7 +9,7 @@
  * @author   2021-2024 - UniCA DSI <dsi.sen@univ-cotedazur.fr>
  * @author   2022 - Université Toulouse 1 Capitole <dsi@univ-tlse1.fr>
  * @license  GNU GPL
- * @link     https://git.unice.fr/dsi-sen/apose
+ * @link     https://github.com/suipnice/apose
  */
 require "../param.php";
 
@@ -70,7 +70,7 @@ function authentificationCAS()
 
     return $statut;
 
-} // end authentification_CAS()
+}//end authentification_CAS()
 
 
 /**
@@ -187,7 +187,7 @@ function requete($cnx_mysql, $libreq, $debug = 0)
     $erreur .= $libreq . "\n" . MYSQLI_ERROR($cnx_mysql) . "\n";
 
     echo $erreur;
-    die('UNE ERREUR A ÉTÉ RENCONTRÉE\n ');
+    die("UNE ERREUR A ÉTÉ RENCONTRÉE\n\n");
 
 }
 
@@ -259,9 +259,9 @@ function chercheElpFils(
     // $ses = filter_input(INPUT_POST, "cod_ses");
 
     $label_sess = [
-        "0" => "Unique",
-        "1" => "1",
-        "2" => "2",
+        0 => "Unique",
+        1 => "1",
+        2 => "2",
     ];
 
     if ($type === "tableau") {
@@ -406,8 +406,17 @@ function chercheElpFils(
                 }
             }
 
+            if ($desc === 0 and SYLLABUS_LINK !== "") {
+                $link = str_replace("[[cod_elp]]", $cod_elp, $link);
+                $link = str_replace("[[cod_anu]]", $cod_anu, $link);
+                $aff_cod_elp = "<a href='$link'
+                    title='Voir le syllabus de $cod_elp'>$cod1$cod_elp$cod2</a>";
+            } else {
+                $aff_cod_elp = "$cod1$cod_elp$cod2";
+            }
+
             $res .= "$tabulation1 $lib_niveau $tag1$lib_elp$tag2
-                     $tabulation2 <$tag rel='cod_elp'> $cod1$cod_elp$cod2 </$tag>
+                     $tabulation2 <$tag rel='cod_elp'>$aff_cod_elp</$tag>
                      <$tag rel='cod_nel'>$cod_nel</$tag>
                      <$tag rel='cod_pel'>$cod_pel</$tag>
                      <$tag rel='nb_crd_elp'>$nbr_crd_elp</$tag>
@@ -470,9 +479,9 @@ function chercheElpFils(
                 // AFFICHAGE SESSIONS paramètres :
                 // 1=session 1 | 2=session 2
                 // 3=session  unique | 4=toutes les sessions
-                if ($_SESSION['epr'] === '1') {
+                if ($_SESSION['epr'] === 1) {
                     $code_ses = $_SESSION['cod_ses'];
-                    if ($code_ses === '4') {
+                    if ($code_ses === 4) {
                         // Affichage de toutes les sessions.
                         $critsess = '';
                     } else {
@@ -506,7 +515,7 @@ function chercheElpFils(
                         $res .= "<td></td><td></td><td></td>";
                         $res .= "</tr>";
                     }
-                }// End If Affichage des sessions
+                }//end if Affichage des sessions
 
                 // Montage pdf-csv.
                 if ($type === "webip") {
@@ -540,9 +549,9 @@ function chercheElpFils(
             } else {
                 $res .= "";
             }
-            if ($_SESSION['epr'] === '1') {
+            if ($_SESSION['epr'] === 1) {
                 $cod_ses = $_SESSION['cod_ses'];
-                if ($cod_ses === '4') {//Affichage de toutes les sessions
+                if ($cod_ses === 4) {//Affichage de toutes les sessions
                     $critsess = '';
                 } else {
                     $critsess = "AND epr_sanctionne_elp.cod_ses='$cod_ses'";

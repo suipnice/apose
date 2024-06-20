@@ -2,7 +2,7 @@
  * ApoSE
  *
  * @license  GNU GPL
- * @link     https://git.unice.fr/dsi-sen/apose
+ * @link     https://github.com/suipnice/apose
  */
 
 (function() {

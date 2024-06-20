@@ -8,7 +8,7 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8 */;
 
 --
--- Base de données: `apose2`
+-- Base de données: `apose`
 --
 
 -- --------------------------------------------------------
@@ -102,7 +102,7 @@ CREATE TABLE IF NOT EXISTS `etape` (
   `cod_etp` varchar(6) NOT NULL DEFAULT '',
   `cod_vrs_vet` varchar(3) NOT NULL DEFAULT '',
   `lic_etp` varchar(25) NOT NULL DEFAULT '',
-  `lib_etp` varchar(100) NOT NULL DEFAULT '',
+  `lib_etp` varchar(120) NOT NULL DEFAULT '',
   `cod_cyc` varchar(10) NOT NULL DEFAULT '',
   `cod_cmp` varchar(5) NOT NULL DEFAULT '',
   `cod_anu` varchar(4) NOT NULL,
@@ -185,7 +185,7 @@ CREATE TABLE IF NOT EXISTS `table_etape_apo` (
   `cod_etp` varchar(6) NOT NULL DEFAULT '',
   `cod_vrs_vet` varchar(3) NOT NULL DEFAULT '',
   `lic_etp` varchar(25) NOT NULL DEFAULT '',
-  `lib_etp` varchar(100) NOT NULL DEFAULT '',
+  `lib_etp` varchar(120) NOT NULL DEFAULT '',
   `cod_cyc` varchar(10) NOT NULL DEFAULT '',
   `cod_cmp` varchar(5) NOT NULL DEFAULT '',
   `nb_etu` varchar(6) NOT NULL DEFAULT '',
@@ -202,7 +202,7 @@ CREATE TABLE IF NOT EXISTS `table_etape_nbetu` (
   `cod_anu` varchar(4) NOT NULL DEFAULT '',
   `cod_etp` varchar(6) NOT NULL DEFAULT '',
   `cod_vrs_vet` varchar(3) NOT NULL DEFAULT '',
-  `lib_etp` varchar(100) NOT NULL DEFAULT '',
+  `lib_etp` varchar(120) NOT NULL DEFAULT '',
   `nb_etu` varchar(6) NOT NULL DEFAULT ''
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 

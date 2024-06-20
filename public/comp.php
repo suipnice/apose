@@ -9,7 +9,7 @@
  * @author   2021-2024 - UniCA DSI <dsi.sen@univ-cotedazur.fr>
  * @author   2022 - Université Toulouse 1 Capitole <dsi@univ-tlse1.fr>
  * @license  GNU GPL
- * @link     https://git.unice.fr/dsi-sen/apose
+ * @link     https://github.com/suipnice/apose
  */
 
 session_start();
@@ -75,7 +75,7 @@ if (isset($_SESSION["authen"]) === false or $_SESSION["authen"] !== 'ok') {
                                             <option value="">
                                                 Sélectionnez une composante</option>
                                             <?php
-                                            //recuperation des composantes
+                                            // Recuperation des composantes.
                                             $sql = "SELECT DISTINCT lib_cmp, cod_cmp
                                                     FROM composante
                                                     ORDER BY lib_cmp";
@@ -88,7 +88,7 @@ if (isset($_SESSION["authen"]) === false or $_SESSION["authen"] !== 'ok') {
                                                 echo "<option value='" . $enr[1] . "'
                                                      >" . $enr[0] . "</option>";
                                             }
-                                            ;
+
                                             ?>
                                         </select>
                                     </div>
@@ -149,5 +149,5 @@ if (isset($_SESSION["authen"]) === false or $_SESSION["authen"] !== 'ok') {
 
     <?php
     include "../include/footer.php";
-} // end if authen == OK
+}//end if authen == OK
 ?>
