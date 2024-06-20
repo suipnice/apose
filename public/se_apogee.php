@@ -321,7 +321,7 @@ if (isset($_SESSION["authen"]) === false or $_SESSION["authen"] !== 'ok') {
                 </fieldset>
 
                 <?php
-                $tot = $cptY + $cptN;
+                $tot = ($cptY + $cptN);
                 echo "<p class='mt-2'>
                     <strong>$tot Étapes (dont $cptY modélisées)</strong></p>";
                 echo $res2;
@@ -334,6 +334,6 @@ if (isset($_SESSION["authen"]) === false or $_SESSION["authen"] !== 'ok') {
 
     <?php
     include "../include/footer.php";
-}//end if authen
+}//end if
 
 ?>

@@ -26,8 +26,8 @@
     let copyBtn = document.getElementById('copyBtn');
     if(copyBtn) {
         copyBtn.addEventListener('click', function () {
-            let content = document.getElementById('arbo2').outerHTML;
-            updateClipboard(content);
+            let copyContent = document.getElementById('arbo2').outerHTML;
+            updateClipboard(copyContent);
         }, false);
     }
 

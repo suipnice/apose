@@ -227,14 +227,14 @@ if (isset($_SESSION["authen"]) === false or $_SESSION["authen"] !== 'ok') {
             </form>
 
             <?php
-            // Affichage du libellé de la composante
+            // Affichage du libellé de la composante.
             $reqa = requete(
                 $cnx_mysql,
                 "SELECT lib_cmp FROM composante WHERE cod_cmp='$comp'"
             );
             while (is_array($row = mysqli_fetch_row($reqa)) === true) {
                 $lib_comp = $row[0];
-            }// fin while lib composante
+            }
             ?>
 
             <h1 class="has-text-centered mt-2">
@@ -242,7 +242,6 @@ if (isset($_SESSION["authen"]) === false or $_SESSION["authen"] !== 'ok') {
             <h2 class="has-text-centered">
                 <?php echo $lib_comp; ?> | <?php echo $cod_anu; ?>
             </h2>
-
 
             <?php
             echo $res2;

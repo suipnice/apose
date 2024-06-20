@@ -13,9 +13,9 @@
  */
 
 // Set "YES" for mode test
-// Set "NO" for mode prod
+// Set "NO" for mode prod.
 define("APP_MODE_TEST", "NO");
-// Set "YES" pour debug or "NO" pour cacher debug
+// Set "YES" pour debug or "NO" pour cacher debug.
 define("APP_MODE_DEBUG", "NO");
 
 define("UNIV_NAME", "Université XXX");
@@ -46,7 +46,7 @@ DEFINE("PASSWD_ORACLE", "A_CHANGER");
 DEFINE("USER_ORACLE", "apogee");
 
 // Nombre d'années précédentes à afficher
-// (1 pour l'an passé, 0 pour uniquement l'année courante)
+// (1 pour l'an passé, 0 pour uniquement l'année courante).
 DEFINE("NB_PREV_YEAR", 1);
 
 // PARAMETRES CAS.

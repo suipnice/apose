@@ -415,20 +415,24 @@ function recupSimple(
             foreach ($row as $cle => $valeur) {
                 $valeur = str_replace(",", ".", $valeur);
 
-                // Colonnes qui doivent numériques plutôt que chaine vide ''
-                $num_cols = ["NBR_VOL_ELP", "NB_HEU_ELP"];
+                // Colonnes qui doivent numériques plutôt que chaine vide ''.
+                $num_cols = [
+                    "NBR_VOL_ELP",
+                    "NB_HEU_ELP"
+                ];
                 if (in_array($cle, $num_cols) and $valeur === '') {
                     $valeur = 0;
                 }
 
-                // Colonnes qui doivent être NULL plutot que ''
+                // Colonnes qui doivent être NULL plutot que chaine vide ''.
                 if (in_array($cle, ["NB_HEU"]) and $valeur === '') {
-                    /* Retire "'" à la fin */
+                    // Retire "'" à la fin.
                     $sql = substr($sql, 0, -1);
                     $sql .= "NULL,'";
                 } else {
                     $sql .= str_replace("'", "\\'", $valeur) . "','";
                 }
+
                 $keys[] = $cle;
             }
             // Enleve les 2 caracteres à la fin (,').
@@ -439,15 +443,16 @@ function recupSimple(
                                VALUES(" . $sql . ")";
 
             requete($cnx_mysql, $req_insert_sql);
-        }
+        }//end while
 
         requete($cnx_mysql, "unlock tables");
     } else {
-        $e = oci_error();
+        $err = oci_error();
         echo "cursor = '$cursor' // result = $result";
         die(
             "Erreur Requete ORACLE \n$lib_query\n
-            " . print_r($e['message']) . "\n"
+            " . print_r($err['message']) . "\n"
         );
     }//end if
+
 }

@@ -26,6 +26,7 @@ if (php_sapi_name() !== 'cli') {
     if (isset($_SESSION["authen"]) === false or $_SESSION["authen"] !== 'ok') {
         die('Accès refusé.');
     }
+
     echo '<html><body><pre>';
 }
 

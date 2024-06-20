@@ -13,6 +13,7 @@
  */
 require "../param.php";
 
+
 /**
  * Get param from POST and ensure it's an int, with specified default value
  *
@@ -156,6 +157,7 @@ function connexionMysql(
     if (mysqli_connect_errno() === 0) {
         return $link;
     }
+
     printf("Échec de la connexion : %s\n", mysqli_connect_error());
     exit();
 
