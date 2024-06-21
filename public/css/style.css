@@ -78,32 +78,6 @@ pre.debug {
 	background-color: #f2f2f2;
 }
 
-.bouton-submit {
-	border-width: 1px;
-	color: #FFF;
-	cursor: pointer;
-	justify-content: center;
-	padding: calc(.5em - 1px) 1em;
-	text-align: center;
-	white-space: nowrap;
-	margin-bottom: .5rem;
-	border-radius: .375em;
-	box-shadow: none;
-	display: inline-flex;
-	height: 2.5em;
-	background-color: var(--primary-color);
-	border-color: transparent;
-	min-width: 6em;
-}
-
-.bouton-submit:hover {
-	background-color: #3488ce;
-}
-
-.bouton-submit a {
-	color: #FFF;
-}
-
 /* Session styles */
 
 li[class^="sess-"] {
