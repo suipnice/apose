@@ -223,7 +223,8 @@ if (isset($_SESSION["authen"]) === false or $_SESSION["authen"] !== 'ok') {
                 <input type="hidden" name="numero" value="<?php echo $numero; ?>">
                 <input type="hidden" name="ladd" value="<?php echo $ladd; ?>">
                 <input type="hidden" name="charge" value="<?php echo $charge; ?>">
-                <input class="bouton-submit" type="submit" value="Retour">
+                <input class="button is-primary is-light"
+                    type="submit" value="Retour">
             </form>
 
             <?php
@@ -253,7 +254,8 @@ if (isset($_SESSION["authen"]) === false or $_SESSION["authen"] !== 'ok') {
                 <input type="hidden" name="numero" value="<?php echo $numero; ?>">
                 <input type="hidden" name="ladd" value="<?php echo $ladd; ?>">
                 <input type="hidden" name="charge" value="<?php echo $charge; ?>">
-                <input class="bouton-submit" type="submit" value="Retour">
+                <input class="button is-primary is-light"
+                    type="submit" value="Retour">
             </form>
         </div>
     </div>

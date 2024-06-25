@@ -104,7 +104,8 @@ if (isset($_SESSION["authen"]) === false or $_SESSION["authen"] !== 'ok') {
                             <div class="field-body">
                                 <div class="field">
                                     <div class="control">
-                                        <input class="bouton-submit" type="submit" value="Consulter">
+                                        <input class="button is-primary"
+                                            type="submit" value="Consulter">
                                     </div>
                                 </div>
                             </div>
@@ -113,17 +114,17 @@ if (isset($_SESSION["authen"]) === false or $_SESSION["authen"] !== 'ok') {
 
                 </div>
                 <div class="block container is-max-desktop mt-3 mb-3">
+                    <strong>Nouveau !</strong>
                     Pour <strong>exporter</strong> la structure des enseignements
                     obtenue, il vous suffit :
                     <ul>
-                        <li>de sélectionner l'ensemble du document
-                            <span class="icon has-text-info"><i class="fas fa-mouse-pointer" aria-hidden="true"></i>
+                        <li>de cliquer sur le bouton
+                            <span class="icon has-text-info">
+                                <i class="fas fa-clipboard" aria-hidden="true"></i>
                             </span>
+                            Copier le tableau
                         </li>
-                        <li>de le copier
-                            <span class="icon has-text-info"><i class="fas fa-copy" aria-hidden="true"></i></span>
-                        </li>
-                        <li>et de le coller dans un nouveau document
+                        <li>et de le coller dans un document
                             Excel (Microsoft Office) ou Calc (OpenOffice)
                             <span class="icon has-text-info"><i class="fas fa-file-excel" aria-hidden="true"></i></span>
                         </li>

@@ -383,23 +383,23 @@ function chercheElpFils(
                        AND cod_elp = '$cod_elp'
                      ORDER BY COD_TYP_HEU;";
                 debug($sql);
-                $rescharge = $cnx_mysql->query($sql);
-                if ($rescharge->num_rows === 0) {
+                $qcharg = $cnx_mysql->query($sql);
+                if ($qcharg->num_rows === 0) {
                     for ($n = 0; $n < $nbchg; $n++) {
                         $affcharge = $affcharge . "<td class='no-charge'></td>";
                     }
                 } else {
                     $index = 0;
-                    while (is_array($enrcharge = mysqli_fetch_array($rescharge)) === true) {
+                    while (is_array($rcharg = mysqli_fetch_array($qcharg)) === true) {
                         while (
-                            strcmp($enrcharge['COD_TYP_HEU'], $entetes[$index]) != 0
+                            strcmp($rcharg['COD_TYP_HEU'], $entetes[$index]) != 0
                         ) {
                             $affcharge = $affcharge . "<td></td>";
                             $index = $index + 1;
                         }
 
                         $affcharge = "$affcharge<td rel='nb_heu'>
-                            " . $enrcharge['NB_HEU_ELP'] . "</td>";
+                            " . $rcharg['NB_HEU_ELP'] . "</td>";
                         $index = $index + 1;
                     }
                     for (; $index < $nbchg; $index++) {
@@ -409,10 +409,11 @@ function chercheElpFils(
             }
 
             if ($desc === 0 and SYLLABUS_LINK !== "") {
-                $link = str_replace("[[cod_elp]]", $cod_elp, $link);
+                $link = str_replace("[[cod_elp]]", $cod_elp, SYLLABUS_LINK);
                 $link = str_replace("[[cod_anu]]", $cod_anu, $link);
-                $aff_cod_elp = "<a href='$link'
-                    title='Voir le syllabus de $cod_elp'>$cod1$cod_elp$cod2</a>";
+                $aff_cod_elp = "<a href='$link' target=\"_blank\"
+                    title='Voir le syllabus de $cod_elp (nouvel onglet)'>
+                    $cod1$cod_elp$cod2</a>";
             } else {
                 $aff_cod_elp = "$cod1$cod_elp$cod2";
             }

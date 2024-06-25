@@ -180,7 +180,7 @@ if (isset($_SESSION["authen"]) === false or $_SESSION["authen"] !== 'ok') {
                 $lib_comp = $row[0];
             }
             ?>
-            <a href="comp.php"><span class='bouton-submit'>Retour</span></a>
+            <a class="button is-primary is-light" href="comp.php">Retour</a>
 
             <h1 class="has-text-centered mt-2">
                 Consultation de la structure des enseignements
@@ -328,7 +328,7 @@ if (isset($_SESSION["authen"]) === false or $_SESSION["authen"] !== 'ok') {
                 echo $res;
                 echo $res3;
                 ?>
-                <a href="comp.php"><span class='bouton-submit'>Retour</span></a>
+                <a href="comp.php" class='button is-primary is-light'>Retour</a>
         </div>
     </div>
 
