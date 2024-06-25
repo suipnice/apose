@@ -411,8 +411,9 @@ function chercheElpFils(
             if ($desc === 0 and SYLLABUS_LINK !== "") {
                 $link = str_replace("[[cod_elp]]", $cod_elp, SYLLABUS_LINK);
                 $link = str_replace("[[cod_anu]]", $cod_anu, $link);
-                $aff_cod_elp = "<a href='$link'
-                    title='Voir le syllabus de $cod_elp'>$cod1$cod_elp$cod2</a>";
+                $aff_cod_elp = "<a href='$link' target=\"_blank\"
+                    title='Voir le syllabus de $cod_elp (nouvel onglet)'>
+                    $cod1$cod_elp$cod2</a>";
             } else {
                 $aff_cod_elp = "$cod1$cod_elp$cod2";
             }
