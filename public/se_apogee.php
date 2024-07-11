@@ -43,9 +43,16 @@ if (isset($_SESSION["authen"]) === false or $_SESSION["authen"] !== 'ok') {
 
     $def_zero = ['options' => ['default' => 0]];
     $def_one = ['options' => ['default' => 1]];
-
-    $radio_epr = filter_var($_SESSION['epr'], FILTER_VALIDATE_INT, $def_zero);
-    $radio_ses = filter_var($_SESSION['cod_ses'], FILTER_VALIDATE_INT, $def_one);
+    if (isset($_SESSION['epr'])) {
+        $radio_epr = filter_var($_SESSION['epr'], FILTER_VALIDATE_INT, $def_zero);
+    } else {
+        $radio_epr = 0;
+    }
+    if (isset($_SESSION['cod_ses'])) {
+        $radio_ses = filter_var($_SESSION['cod_ses'], FILTER_VALIDATE_INT, $def_one);
+    } else {
+        $radio_ses = 1;
+    }
     $res2 .= "<h3>Liste des années d’études disponibles sur APOGEE :</h3>";
 
     $res3 .= "<hr><h3>Liste des années d’études non modélisées sur APOGEE :</h3>";

@@ -116,7 +116,11 @@ function identificationLDAP($login)
 
     for ($i = 0; $i < $info["count"]; $i++) {
         $uid = $info[$i]["uid"][0];
-        $supannetuid = $info[$i]["supannetuid"][0];
+        if (isset($info[$i]["supannetuid"])) {
+            $supannetuid = $info[$i]["supannetuid"][0];
+        } else {
+            $supannetuid = "";
+        }
         $mail = $info[$i]["mail"][0];
         $username = $info[$i]["cn"][0];
         $prim_affiliation = $info[$i]["edupersonprimaryaffiliation"][0];
@@ -152,7 +156,10 @@ function connexionMysql(
     $user_mysql = USER_MYSQL,
     $passwd_mysql = PASSWD_MYSQL
 ) {
-    $link = mysqli_connect($hote_mysql, $user_mysql, $passwd_mysql, $base_mysql);
+    // "p:" is for persistant connexion, to avoid some
+    // (HY000/2003): Can't connect to MySQL server (Cannot assign requested address)
+    // see https://www.php.net/manual/en/mysqli.persistconns.php
+    $link = mysqli_connect("p:$hote_mysql", $user_mysql, $passwd_mysql, $base_mysql);
     // Vérification de la connexion.
     if (mysqli_connect_errno() === 0) {
         return $link;
@@ -319,6 +326,7 @@ function chercheElpFils(
                 AND table_elp_nbetu.cod_etp = '$etp'
                 AND table_elp_nbetu.cod_vrs_etp = '$cod_vrs_vet'"
         );
+        $elp_nbetu = "";
         while (is_array($rnbip = mysqli_fetch_assoc($reqnbip)) === true) {
             $elp_nbetu = $rnbip['nb_etu_ip'];
         }
@@ -394,16 +402,16 @@ function chercheElpFils(
                         while (
                             strcmp($rcharg['COD_TYP_HEU'], $entetes[$index]) != 0
                         ) {
-                            $affcharge = $affcharge . "<td></td>";
-                            $index = $index + 1;
+                            $affcharge .= "<td></td>";
+                            $index++;
                         }
 
                         $affcharge = "$affcharge<td rel='nb_heu'>
                             " . $rcharg['NB_HEU_ELP'] . "</td>";
-                        $index = $index + 1;
+                        $index++;
                     }
                     for (; $index < $nbchg; $index++) {
-                        $affcharge = $affcharge . "<td></td>";
+                        $affcharge .= "<td></td>";
                     }
                 }
             }

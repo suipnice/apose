@@ -25,6 +25,7 @@ if (isset($_SESSION["authen"]) === false or $_SESSION["authen"] !== 'ok') {
     $res2 = "";
     $adresse = "";
     $cpt = 0;
+    $entetes = [];
 
     if (empty($_POST) === false) {
         $RefEtp = filter_input(INPUT_POST, "RefEtp");

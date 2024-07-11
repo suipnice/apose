@@ -26,47 +26,59 @@ if (APP_MODE_TEST === "YES") {
 
     // CONNEXION MYSQL.
     define("HOTE_MYSQL", "mysql.univ.fr");
-    define("USER_MYSQL", "apose2");
+    define("USER_MYSQL", "aposetest");
     define("PASSWD_MYSQL", "A_CHANGER");
-    DEFINE("MYSQL_BASE_DATAS", "APOSE2");
+    define("MYSQL_BASE_DATAS", "APOSETEST");
 } else {
     // #### MODE PROD ####
     define("APP_NAME", "ApoSE");
 
     // PARAMETRES DE CONNEXION MYSQL.
     define("HOTE_MYSQL", "mysql.univ.fr");
-    define("USER_MYSQL", "apose2");
+    define("USER_MYSQL", "apose");
     define("PASSWD_MYSQL", "A_CHANGER");
-    define("MYSQL_BASE_DATAS", "APOSE2");
+    define("MYSQL_BASE_DATAS", "APOSE");
 }
 
 // PARAMETRES DE CONNEXION ORACLE.
-DEFINE("BASE_ORACLE", "APOPROD");
-DEFINE("PASSWD_ORACLE", "A_CHANGER");
-DEFINE("USER_ORACLE", "apogee");
+define("BASE_ORACLE", "APOPROD");
+define("PASSWD_ORACLE", "A_CHANGER");
+define("USER_ORACLE", "apogee");
 
 // Nombre d'années précédentes à afficher
 // (1 pour l'an passé, 0 pour uniquement l'année courante).
-DEFINE("NB_PREV_YEAR", 1);
+define("NB_PREV_YEAR", 1);
 
 // PARAMETRES CAS.
-DEFINE("CAS_HOST", "login.univ.fr");
-DEFINE("CAS_PORT", 443);
-DEFINE("CAS_URI", "");
+define("CAS_HOST", "login.univ.fr");
+define("CAS_PORT", 443);
+define("CAS_URI", "");
 
 // PARAMETRES LDAP.
-DEFINE("LDAP_BASE_DN", "ou=people,dc=univ,dc=fr");
-DEFINE("LDAP_SERVEUR", "ldap.univ.fr");
-DEFINE("LDAP_PORT", 389);
+define("LDAP_BASE_DN", "ou=people,dc=univ,dc=fr");
+define("LDAP_SERVEUR", "ldap.univ.fr");
+define("LDAP_PORT", 389);
 define("LDAP_BIND_RDN", "cn=manager,dc=univ,dc=fr");
 define("LDAP_BIND_PWD", "A_CHANGER");
 
-DEFINE("CHEMIN_PUBLIC", "/var/www/public/");
+// Affiliations autorisées à utiliser ApoSE
+define(
+    "AUTHORIZED",
+    [
+        "staff",
+        "teacher",
+        "faculty",
+        "researcher",
+        "employee"
+    ]
+);
+
+define("CHEMIN_PUBLIC", "/var/www/public/");
 
 // Lien vers un syllabus pour les éléments terminaux
 // Il doit contenir les champs [[cod_elp]] et [[cod_anu]],
 // qui seront remplacés par leur valeurs respectives.
-DEFINE(
+define(
     "SYLLABUS_LINK",
     "https://syllabus.univ.fr/fr/course/router/[[cod_elp]]/[[cod_anu]]"
 );

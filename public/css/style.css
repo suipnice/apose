@@ -1,6 +1,12 @@
 :root {
 	--primary-color: #2E79C6;
 	--secondary-color: #b9dcfa;
+
+	/* Bulma properties */
+	--bulma-primary-h: 210;
+	--bulma-primary-s: 62%;
+	--bulma-primary-l: 48%;
+	--bulma-primary-invert-l: var(--bulma-primary-100-l);
 }
 
 /* Do not Capitalize th */

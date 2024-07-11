@@ -18,14 +18,8 @@ require "../include/fonctions.php";
 // sinon on demande une authentification CAS.
 if (isset($_SESSION['authen']) === false) {
     $statut = authentificationCAS();
-    $authorized = [
-        "staff",
-        "teacher",
-        "faculty",
-        "researcher",
-        "employee"
-    ];
-    if (in_array($statut, $authorized) === true) {
+
+    if (in_array($statut, AUTHORIZED) === true) {
         $_SESSION['authen'] = "ok";
         // Redirection.
         echo '<meta http-equiv="Refresh" content="0;url=comp.php">';
