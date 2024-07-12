@@ -156,10 +156,7 @@ function connexionMysql(
     $user_mysql = USER_MYSQL,
     $passwd_mysql = PASSWD_MYSQL
 ) {
-    // "p:" is for persistant connexion, to avoid some
-    // (HY000/2003): Can't connect to MySQL server (Cannot assign requested address)
-    // see https://www.php.net/manual/en/mysqli.persistconns.php
-    $link = mysqli_connect("p:$hote_mysql", $user_mysql, $passwd_mysql, $base_mysql);
+    $link = mysqli_connect($hote_mysql, $user_mysql, $passwd_mysql, $base_mysql);
     // Vérification de la connexion.
     if (mysqli_connect_errno() === 0) {
         return $link;
@@ -394,7 +391,7 @@ function chercheElpFils(
                 $qcharg = $cnx_mysql->query($sql);
                 if ($qcharg->num_rows === 0) {
                     for ($n = 0; $n < $nbchg; $n++) {
-                        $affcharge = $affcharge . "<td class='no-charge'></td>";
+                        $affcharge .= "<td class='no-charge'></td>";
                     }
                 } else {
                     $index = 0;
@@ -406,7 +403,7 @@ function chercheElpFils(
                             $index++;
                         }
 
-                        $affcharge = "$affcharge<td rel='nb_heu'>
+                        $affcharge .= "<td rel='nb_heu'>
                             " . $rcharg['NB_HEU_ELP'] . "</td>";
                         $index++;
                     }
