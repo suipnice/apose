@@ -156,15 +156,10 @@ function connexionMysql(
     $user_mysql = USER_MYSQL,
     $passwd_mysql = PASSWD_MYSQL
 ) {
-    $link = mysqli_connect($hote_mysql, $user_mysql, $passwd_mysql, $base_mysql);
-    // Vérification de la connexion.
-    if (mysqli_connect_errno() === 0) {
-        return $link;
-    }
-
-    printf("Échec de la connexion : %s\n", mysqli_connect_error());
-    exit();
-
+    $link = new mysqli($hote_mysql, $user_mysql, $passwd_mysql, $base_mysql) or die(
+        "Échec de la connexion : {$link->error}\n"
+    );
+    return $link;
 }
 
 

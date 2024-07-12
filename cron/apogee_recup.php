@@ -124,7 +124,7 @@ recupSimple($cnx_mysql, $cnx, "type_heure", queryTableTypHeure());
 echo "\n --- Script OK ---";
 
 oci_close($cnx);
-mysqli_close($cnx_mysql);
+$cnx_mysql->close();
 
 if (php_sapi_name() !== 'cli') {
     echo '</pre></body></html>';
