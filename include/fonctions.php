@@ -342,15 +342,15 @@ function chercheElpFils(
             $tabulation1 = "";
         }
         if ($type === "tableau") {
-            $res .= "<tr><td>";
+            $res .= "<tr rel='$cod_elp'><td>";
         } else {
             $res .= "<li>";
         }
         // voir si fils
         $req2 = requete(
             $cnx_mysql,
-            "SELECT t1.cod_lse,t2.cod_typ_lse, t1.nbr_min_elp_obl_chx,
-                t1.nbr_max_elp_obl_chx
+            "SELECT t1.cod_lse, t2.cod_typ_lse, t1.nbr_min_elp_obl_chx,
+                t1.nbr_max_elp_obl_chx, t2.lib_lse
             FROM elp_regroupe_lse AS t1
             INNER JOIN liste_elp AS t2
                 ON t1.cod_lse=t2.cod_lse
@@ -386,24 +386,26 @@ function chercheElpFils(
                 $qcharg = $cnx_mysql->query($sql);
                 if ($qcharg->num_rows === 0) {
                     for ($n = 0; $n < $nbchg; $n++) {
-                        $affcharge .= "<td class='no-charge'></td>";
+                        $affcharge .= "<$tag class='no-charge'></$tag>";
                     }
                 } else {
                     $index = 0;
-                    while (is_array($rcharg = mysqli_fetch_array($qcharg)) === true) {
+                    while (
+                        is_array($rcharg = mysqli_fetch_array($qcharg)) === true
+                    ) {
                         while (
                             strcmp($rcharg['COD_TYP_HEU'], $entetes[$index]) != 0
                         ) {
-                            $affcharge .= "<td></td>";
+                            $affcharge .= "<$tag></$tag>";
                             $index++;
                         }
 
-                        $affcharge .= "<td rel='nb_heu'>
-                            " . $rcharg['NB_HEU_ELP'] . "</td>";
+                        $affcharge .= "<$tag rel='nb_heu'>
+                            " . $rcharg['NB_HEU_ELP'] . "</$tag>";
                         $index++;
                     }
                     for (; $index < $nbchg; $index++) {
-                        $affcharge .= "<td></td>";
+                        $affcharge .= "<$tag></$tag>";
                     }
                 }
             }
@@ -425,6 +427,7 @@ function chercheElpFils(
                      <$tag rel='nb_crd_elp'>$nbr_crd_elp</$tag>
                      <$tag rel='nbetu'>$elp_nbetu</$tag> $affcharge";
         } else {
+            // Type is not Table
             $res .= "$tabulation1 $lib_niveau $tag1$lib_elp$tag2";
         }
 
@@ -450,7 +453,21 @@ function chercheElpFils(
 
         // desc = 1 si il y a des fils/filles.
         if ($desc === 1) {
+
             foreach ($t_liste_lse_filles as $key => $r2) {
+                // Pour les elements fils suivants
+                if ($key > 0) {
+                    if ($type === "tableau") {
+                        $res .= "<tr rel='".$r2['cod_lse']."'><td>$tabulation1";
+                        $res .= "&nbsp;$tag1".$r2['lib_lse'].$tag2;
+                        $res .= "</td><td></td><td>LISTE</td><td colspan='3'></td>";
+                        if ($charge === "1") {
+                            $res .= "<td colspan='3'></td>";
+                        }
+                    } else {
+                        $res .= "<li rel='".$r2['cod_lse']."'>";
+                    }
+                }
                 $max = $r2['nbr_max_elp_obl_chx'];
                 $min = $r2['nbr_min_elp_obl_chx'];
                 $cod_lse_aff = $r2['cod_lse'];
@@ -544,9 +561,8 @@ function chercheElpFils(
                     ) . "";
                 }
             }
-        }
-
-        if ($desc === 0) {
+        } else {
+            // desc = 0 ==> pas de fils/filles.
             if ($type === "tableau") {
                 $res .= "<$tag>&nbsp;</$tag><$tag>&nbsp;</$tag></tr>";
             } else {
@@ -554,7 +570,8 @@ function chercheElpFils(
             }
             if ($_SESSION['epr'] === 1) {
                 $cod_ses = $_SESSION['cod_ses'];
-                if ($cod_ses === 4) {//Affichage de toutes les sessions
+                if ($cod_ses === 4) {
+                    //Affichage de toutes les sessions
                     $critsess = '';
                 } else {
                     $critsess = "AND epr_sanctionne_elp.cod_ses='$cod_ses'";
@@ -586,7 +603,7 @@ function chercheElpFils(
                     $res .= "<td></td><td></td><td></td>";
                     $res .= "</tr>";
                 }
-            }//Fin If Affichage des sessions
+            } //Fin If Affichage des sessions
         }
 
     }
