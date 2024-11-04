@@ -219,6 +219,24 @@ function etpLse($cnx_mysql, $cod_etp_cible, $cod_vrs_vet)
 
 }
 
+/**
+ * Génere une chaine de caracteres permettant d'afficher un niveau d'arbre en ASCII
+ *
+ * @param int $niveau le niveau actuel dans l'arbre
+ *
+ * @return string
+ */
+function getTabulation($niveau): string {
+    $tabulation = "<span class='treeview niv_$niveau'>";
+    for ($i = 2; $i < $niveau; $i++) {
+        $tabulation .= "│&nbsp;&nbsp;";
+    }
+    if ($niveau > 1) {
+        $tabulation .= "├─ ";
+    }
+    $tabulation .= "</span>";
+    return $tabulation;
+}
 
 /**
  * Recuperation des elp fils d'une liste d'une version d'etape
@@ -246,8 +264,6 @@ function chercheElpFils(
 ) {
     // GLOBAL $apogee;
     $res = "";
-    $tabulation1 = "";
-    $tabulation2 = "";
     $cod1 = "";
     $cod2 = "";
     // Libelle Annexe Descriptive du Diplome.
@@ -266,10 +282,7 @@ function chercheElpFils(
     ];
 
     if ($type === "tableau") {
-        for ($i = 1; $i < $niveau; $i++) {
-            $tabulation1 .= "&nbsp;&nbsp;&nbsp;";
-            $tabulation2 .= "";
-        }
+        $tabulation1 = getTabulation($niveau);
         $tag = "td";
     } else {
         $tag = "span";
@@ -421,7 +434,7 @@ function chercheElpFils(
             }
 
             $res .= "$tabulation1 $lib_niveau $tag1$lib_elp$tag2
-                     $tabulation2 <$tag rel='cod_elp'>$aff_cod_elp</$tag>
+                     <$tag rel='cod_elp'>$aff_cod_elp</$tag>
                      <$tag rel='cod_nel'>$cod_nel</$tag>
                      <$tag rel='cod_pel'>$cod_pel</$tag>
                      <$tag rel='nb_crd_elp'>$nbr_crd_elp</$tag>
@@ -458,8 +471,9 @@ function chercheElpFils(
                 // Pour les elements fils suivants
                 if ($key > 0) {
                     if ($type === "tableau") {
-                        $res .= "<tr rel='".$r2['cod_lse']."'><td>$tabulation1";
-                        $res .= "&nbsp;$tag1".$r2['lib_lse'].$tag2;
+                        $res .= "<tr rel='".$r2['cod_lse']."' class='liste_lse'>";
+                        $res .= "<td>";
+                        $res .= "$tabulation1 $tag1".$r2['lib_lse'].$tag2;
                         $res .= "</td><td></td><td>LISTE</td><td colspan='3'></td>";
                         if ($charge === "1") {
                             $res .= "<td colspan='3'></td>";
@@ -522,8 +536,7 @@ function chercheElpFils(
                     );
                     while (is_array($repr = mysqli_fetch_array($reqepr)) === true) {
                         $res .= "<tr class='sess-" . $repr[4] . "'>
-                            <td>$tabulation1$tabulation1
-                            &nbsp;&nbsp;&nbsp;&nbsp;" . $repr[1] . "</td>
+                            <td>$tabulation1 " . $repr[1] . "</td>
                             <td>" . $repr[0] . "</td>
                             <td>" . $repr[2] . "</td>
                             <td>" . $repr[3] . "</td>
@@ -591,8 +604,8 @@ function chercheElpFils(
 
                 while ($repr = $reqepr->fetch_array()) {
                     $res .= "<tr class='sess-" . $repr[4] . "'>
-                            <td rel='repr1'>$tabulation1$tabulation1
-                            &nbsp;&nbsp;&nbsp;" . $repr[1] . "</td>
+                            <td rel='repr1'>$tabulation1
+                            " . $repr[1] . "</td>
                             <td rel='repr0'>" . $repr[0] . "</td>
                             <td rel='repr2'>" . $repr[2] . "</td>
                             <td rel='repr3'>" . $repr[3] . "</td>
