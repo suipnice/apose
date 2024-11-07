@@ -31,6 +31,8 @@ if (isset($_SESSION["authen"]) === false or $_SESSION["authen"] !== 'ok') {
         $RefEtp = filter_input(INPUT_POST, "RefEtp");
         $type = filter_input(INPUT_POST, "type");
         $numero = filter_input(INPUT_POST, "numero");
+        $treeView = getPostBool("treeView");
+        $_SESSION['treeView'] = $treeView;
         $ladd = filter_input(INPUT_POST, "ladd");
         $charge = filter_input(INPUT_POST, "charge");
         $cod_ses = getPostInt("cod_ses");
@@ -201,6 +203,7 @@ if (isset($_SESSION["authen"]) === false or $_SESSION["authen"] !== 'ok') {
                 $niveau,
                 $type,
                 $numero,
+                $treeView,
                 $res_tablo
             );
             if ($type === "webip") {
@@ -222,6 +225,7 @@ if (isset($_SESSION["authen"]) === false or $_SESSION["authen"] !== 'ok') {
                 <input type="hidden" name="Liste_Comp" value="<?php echo $comp; ?>">
                 <input type="hidden" name="cod_anu" value="<?php echo $cod_anu; ?>">
                 <input type="hidden" name="numero" value="<?php echo $numero; ?>">
+                <input type="hidden" name="treeView" value="<?php echo $treeView; ?>">
                 <input type="hidden" name="ladd" value="<?php echo $ladd; ?>">
                 <input type="hidden" name="charge" value="<?php echo $charge; ?>">
                 <input class="button is-primary is-light"
@@ -253,6 +257,7 @@ if (isset($_SESSION["authen"]) === false or $_SESSION["authen"] !== 'ok') {
                 <input type="hidden" name="Liste_Comp" value="<?php echo $comp; ?>">
                 <input type="hidden" name="cod_anu" value="<?php echo $cod_anu; ?>">
                 <input type="hidden" name="numero" value="<?php echo $numero; ?>">
+                <input type="hidden" name="treeView" value="<?php echo $treeView; ?>">
                 <input type="hidden" name="ladd" value="<?php echo $ladd; ?>">
                 <input type="hidden" name="charge" value="<?php echo $charge; ?>">
                 <input class="button is-primary is-light"

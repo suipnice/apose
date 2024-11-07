@@ -36,13 +36,23 @@ if (isset($_SESSION["authen"]) === false or $_SESSION["authen"] !== 'ok') {
     $comp = filter_input(INPUT_POST, "Liste_Comp");
     $cod_anu = filter_input(INPUT_POST, "cod_anu");
 
-    // Memorisation et prise en compte du choix des boutons radios lors du retour.
+    // Memorisation et prise en compte du choix des parametres lors du retour.
     $radio_numero = getPostInt('numero');
+
     $radio_ladd = getPostInt('ladd');
     $radio_charge = getPostInt('charge');
 
     $def_zero = ['options' => ['default' => 0]];
     $def_one = ['options' => ['default' => 1]];
+
+    if (isset($_SESSION['treeView'])) {
+        $treeView = filter_var(
+            $_SESSION['treeView'],
+            FILTER_VALIDATE_BOOLEAN
+        );
+    } else {
+        $treeView = true;
+    }
     if (isset($_SESSION['epr'])) {
         $radio_epr = filter_var($_SESSION['epr'], FILTER_VALIDATE_INT, $def_zero);
     } else {
@@ -223,6 +233,23 @@ if (isset($_SESSION["authen"]) === false or $_SESSION["authen"] !== 'ok') {
                             </div>
                         </div>
                     </div>
+
+                    <div class="field is-horizontal">
+                        <label class="field-label label" for="tree_view">
+                            Indicateur visuel de l’arborescence :
+                        </label>
+                        <div class="field-body">
+                            <input type="checkbox" value="1"
+                                   name="treeView" id="tree_view"
+                                <?php
+                                if ($treeView) {
+                                    echo "checked";
+                                }
+                                ?>
+                            >
+                        </div>
+                    </div>
+
                     <div class="field is-horizontal">
                         <div class="field-label">
                             <span class="label">

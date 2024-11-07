@@ -22,11 +22,24 @@ require "../param.php";
  *
  * @return int the param value
  */
-function getPostInt($param, $default = 0)
+function getPostInt($param, $default = 0): int
 {
     $def = ['options' => ['default' => $default]];
     return filter_input(INPUT_POST, $param, FILTER_VALIDATE_INT, $def);
+}
 
+/**
+ * Get param from POST and ensure it's a bool, with specified default value
+ *
+ * @param string $param   The param to get
+ * @param bool   $default The default value
+ *
+ * @return bool the param value
+ */
+function getPostBool($param, $default = false): bool
+{
+    $def = ['options' => ['default' => $default]];
+    return filter_input(INPUT_POST, $param, FILTER_VALIDATE_BOOLEAN, $def);
 }
 
 
@@ -222,17 +235,24 @@ function etpLse($cnx_mysql, $cod_etp_cible, $cod_vrs_vet)
 /**
  * Génere une chaine de caracteres permettant d'afficher un niveau d'arbre en ASCII
  *
- * @param int $niveau le niveau actuel dans l'arbre
+ * @param int  $niveau   Niveau actuel dans l'arbre
+ * @param bool $treeView Affichage de l'arbre
  *
  * @return string
  */
-function getTabulation($niveau): string {
+function getTabulation($niveau, $treeView=true): string {
     $tabulation = "<span class='treeview niv_$niveau'>";
-    for ($i = 2; $i < $niveau; $i++) {
-        $tabulation .= "│&nbsp;&nbsp;";
-    }
-    if ($niveau > 1) {
-        $tabulation .= "├─ ";
+    if ($treeView) {
+        for ($i = 2; $i < $niveau; $i++) {
+            $tabulation .= "│&nbsp;&nbsp;";
+        }
+        if ($niveau > 1) {
+            $tabulation .= "├─ ";
+        }
+    } else {
+        for ($i = 1; $i < $niveau; $i++) {
+            $tabulation .= "&nbsp;&nbsp;";
+        }
     }
     $tabulation .= "</span>";
     return $tabulation;
@@ -247,7 +267,8 @@ function getTabulation($niveau): string {
  * @param mixed  $cod_lse   cod_lse
  * @param mixed  $niveau    niveau
  * @param string $type      'Tableau' ou '?'
- * @param mixed  $numero    numero
+ * @param mixed  $numero    Affichage des numéros hierarchiques
+ * @param mixed  $treeView  Affichage visuel de la hierarchie
  * @param mixed  $res_tablo res_tablo
  *
  * @return mixed elp fils
@@ -260,6 +281,7 @@ function chercheElpFils(
     $niveau,
     $type = "tableau",
     $numero = 0,
+    $treeView = 1,
     $res_tablo = []
 ) {
     // GLOBAL $apogee;
@@ -282,7 +304,7 @@ function chercheElpFils(
     ];
 
     if ($type === "tableau") {
-        $tabulation1 = getTabulation($niveau);
+        $tabulation1 = getTabulation($niveau, $treeView);
         $tag = "td";
     } else {
         $tag = "span";
@@ -351,9 +373,6 @@ function chercheElpFils(
             $lib_elp = $fetched['lib_elp'];
         } //Fin if ladd
 
-        if ($type <> "tableau") {
-            $tabulation1 = "";
-        }
         if ($type === "tableau") {
             $res .= "<tr rel='$cod_elp'><td>";
         } else {
@@ -466,14 +485,13 @@ function chercheElpFils(
 
         // desc = 1 si il y a des fils/filles.
         if ($desc === 1) {
-
             foreach ($t_liste_lse_filles as $key => $r2) {
                 // Pour les elements fils suivants
                 if ($key > 0) {
                     if ($type === "tableau") {
                         $res .= "<tr rel='".$r2['cod_lse']."' class='liste_lse'>";
                         $res .= "<td>";
-                        $res .= "$tabulation1 $tag1".$r2['lib_lse'].$tag2;
+                        $res .= "$tabulation1 $tag1$lib_niveau".$r2['lib_lse'].$tag2;
                         $res .= "</td><td></td><td>LISTE</td><td colspan='3'></td>";
                         if ($charge === "1") {
                             $res .= "<td colspan='3'></td>";
@@ -534,9 +552,10 @@ function chercheElpFils(
                         ORDER BY epr_sanctionne_elp.cod_ses,
                                  epreuve.lib_epr, epreuve.cod_epr"
                     );
+                    $tabulation2 = getTabulation($niveau+1, $treeView);
                     while (is_array($repr = mysqli_fetch_array($reqepr)) === true) {
                         $res .= "<tr class='sess-" . $repr[4] . "'>
-                            <td>$tabulation1 " . $repr[1] . "</td>
+                            <td>$tabulation2 $lib_niveau" . $repr[1] . "</td>
                             <td>" . $repr[0] . "</td>
                             <td>" . $repr[2] . "</td>
                             <td>" . $repr[3] . "</td>
@@ -560,6 +579,7 @@ function chercheElpFils(
                         $niveau + 1,
                         $type,
                         $numero,
+                        $treeView,
                         $res_tablo
                     );
                 } else {
@@ -570,7 +590,8 @@ function chercheElpFils(
                         $r2['cod_lse'],
                         $niveau + 1,
                         $type,
-                        $numero
+                        $numero,
+                        $treeView
                     ) . "";
                 }
             }
@@ -602,9 +623,10 @@ function chercheElpFils(
                              epreuve.lib_epr, epreuve.cod_epr"
                 );
 
+                $tabulation2 = getTabulation($niveau+1, $treeView);
                 while ($repr = $reqepr->fetch_array()) {
                     $res .= "<tr class='sess-" . $repr[4] . "'>
-                            <td rel='repr1'>$tabulation1
+                            <td rel='repr1'>$tabulation2 $lib_niveau
                             " . $repr[1] . "</td>
                             <td rel='repr0'>" . $repr[0] . "</td>
                             <td rel='repr2'>" . $repr[2] . "</td>
