@@ -213,7 +213,7 @@ if (isset($_SESSION["authen"]) === false or $_SESSION["authen"] !== 'ok') {
                     <div class="field is-horizontal">
                         <div class="field-label">
                             <span class="label">
-                                INDICATEUR NUMÉRIQUE DE L’ARBORESCENCE :
+                                Indicateur numérique de l’arborescence :
                             </span>
                         </div>
                         <div class="field-body">
@@ -255,7 +255,7 @@ if (isset($_SESSION["authen"]) === false or $_SESSION["authen"] !== 'ok') {
                     <div class="field is-horizontal">
                         <div class="field-label">
                             <span class="label">
-                                LIBELLÉS DE L’ANNEXE DESCRIPTIVE DU DIPLÔME :
+                                Libellés de l’annexe descriptive du diplôme :
                             </span>
                         </div>
                         <div class="field-body">
@@ -278,7 +278,7 @@ if (isset($_SESSION["authen"]) === false or $_SESSION["authen"] !== 'ok') {
                     </div>
                     <div class="field is-horizontal">
                         <div class="field-label">
-                            <span class="label">CHARGES D’ENSEIGNEMENTS :</span>
+                            <span class="label">Charges d’enseignements :</span>
                         </div>
                         <div class="field-body">
                             <div class="control">
@@ -299,7 +299,7 @@ if (isset($_SESSION["authen"]) === false or $_SESSION["authen"] !== 'ok') {
                     </div>
                     <div class="field is-horizontal">
                         <div class="field-label">
-                            <span class="label">INFORMATIONS DES ÉPREUVES :</span>
+                            <span class="label">Informations des épreuves :</span>
                         </div>
                         <div class="field-body">
                             <div class="control">
@@ -323,7 +323,7 @@ if (isset($_SESSION["authen"]) === false or $_SESSION["authen"] !== 'ok') {
                         echo "is-invisible";
                     } ?> ">
                         <div class="field-label">
-                            <span class="label p-2">SESSIONS :</span>
+                            <span class="label p-2">Sessions :</span>
                         </div>
                         <div class="field-body">
                             <div class="control">

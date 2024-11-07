@@ -90,6 +90,7 @@ pre.debug {
 
 .option .field-label {
   flex-basis: 20em;
+  font-variant-caps: small-caps;
 }
 
 .option-recherche {
