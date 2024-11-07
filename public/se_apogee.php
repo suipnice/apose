@@ -51,7 +51,7 @@ if (isset($_SESSION["authen"]) === false or $_SESSION["authen"] !== 'ok') {
             FILTER_VALIDATE_BOOLEAN
         );
     } else {
-        $treeView = true;
+        $treeView = false;
     }
     if (isset($_SESSION['epr'])) {
         $radio_epr = filter_var($_SESSION['epr'], FILTER_VALIDATE_INT, $def_zero);
@@ -241,14 +241,16 @@ if (isset($_SESSION["authen"]) === false or $_SESSION["authen"] !== 'ok') {
                             </label>
                         </div>
                         <div class="field-body">
-                            <input type="checkbox" value="1"
-                                   name="treeView" id="tree_view"
-                                <?php
-                                if ($treeView) {
-                                    echo "checked";
-                                }
-                                ?>
-                            >
+                            <div class="control">
+                                <input type="checkbox" value="1"
+                                    name="treeView" id="tree_view"
+                                    <?php
+                                    if ($treeView) {
+                                        echo "checked";
+                                    }
+                                    ?>
+                                >
+                            </div>
                         </div>
                     </div>
 
