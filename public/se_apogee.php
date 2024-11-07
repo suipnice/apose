@@ -235,9 +235,11 @@ if (isset($_SESSION["authen"]) === false or $_SESSION["authen"] !== 'ok') {
                     </div>
 
                     <div class="field is-horizontal">
-                        <label class="field-label label" for="tree_view">
-                            Indicateur visuel de l’arborescence :
-                        </label>
+                        <div class="field-label">
+                            <label class="label" for="tree_view">
+                                Indicateur visuel de l’arborescence :
+                            </label>
+                        </div>
                         <div class="field-body">
                             <input type="checkbox" value="1"
                                    name="treeView" id="tree_view"
