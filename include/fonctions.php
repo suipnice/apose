@@ -129,7 +129,7 @@ function identificationLDAP($login)
 
     for ($i = 0; $i < $info["count"]; $i++) {
         $uid = $info[$i]["uid"][0];
-        if (isset($info[$i]["supannetuid"])) {
+        if (isset($info[$i]["supannetuid"]) === true) {
             $supannetuid = $info[$i]["supannetuid"][0];
         } else {
             $supannetuid = "";

@@ -61,15 +61,15 @@ define("LDAP_PORT", 389);
 define("LDAP_BIND_RDN", "cn=manager,dc=univ,dc=fr");
 define("LDAP_BIND_PWD", "A_CHANGER");
 
-// Affiliations autorisées à utiliser ApoSE
+// Affiliations autorisées à utiliser ApoSE.
 define(
     "AUTHORIZED",
     [
-        "staff",
-        "teacher",
-        "faculty",
-        "researcher",
-        "employee"
+     "staff",
+     "teacher",
+     "faculty",
+     "researcher",
+     "employee",
     ]
 );
 

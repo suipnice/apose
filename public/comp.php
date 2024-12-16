@@ -53,9 +53,10 @@ if (isset($_SESSION["authen"]) === false or $_SESSION["authen"] !== 'ok') {
                                                 ) === true
                                             ) {
                                                 echo "<option value='$enr[0]'";
-                                                if ($i == NB_PREV_YEAR) {
+                                                if ($i === NB_PREV_YEAR) {
                                                     echo "selected";
                                                 }
+
                                                 echo ">" . $enr[0] . "</option>";
                                                 $i++;
                                             }

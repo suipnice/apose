@@ -45,7 +45,7 @@ if (isset($_SESSION["authen"]) === false or $_SESSION["authen"] !== 'ok') {
     $def_zero = ['options' => ['default' => 0]];
     $def_one = ['options' => ['default' => 1]];
 
-    if (isset($_SESSION['treeView'])) {
+    if (isset($_SESSION['treeView']) === true) {
         $treeView = filter_var(
             $_SESSION['treeView'],
             FILTER_VALIDATE_BOOLEAN
@@ -53,16 +53,19 @@ if (isset($_SESSION["authen"]) === false or $_SESSION["authen"] !== 'ok') {
     } else {
         $treeView = false;
     }
-    if (isset($_SESSION['epr'])) {
+
+    if (isset($_SESSION['epr']) === true) {
         $radio_epr = filter_var($_SESSION['epr'], FILTER_VALIDATE_INT, $def_zero);
     } else {
         $radio_epr = 0;
     }
-    if (isset($_SESSION['cod_ses'])) {
+
+    if (isset($_SESSION['cod_ses']) === true) {
         $radio_ses = filter_var($_SESSION['cod_ses'], FILTER_VALIDATE_INT, $def_one);
     } else {
         $radio_ses = 1;
     }
+
     $res2 .= "<h3>Liste des années d’études disponibles sur APOGEE :</h3>";
 
     $res3 .= "<hr><h3>Liste des années d’études non modélisées sur APOGEE :</h3>";
@@ -236,22 +239,19 @@ if (isset($_SESSION["authen"]) === false or $_SESSION["authen"] !== 'ok') {
 
                     <div class="field is-horizontal">
                         <div class="field-label">
-                            <label class="label" for="tree_view">
-                                Indicateur visuel de l’arborescence :
-                            </label>
-                        </div>
-                        <div class="field-body">
-                            <div class="control">
-                                <input type="checkbox" value="1"
-                                    name="treeView" id="tree_view"
+                            <input type="checkbox" value="1" class="switch is-rounded"
+                                   name="treeView" id="tree_view"
                                     <?php
-                                    if ($treeView) {
+                                    if ($treeView === true) {
                                         echo "checked";
                                     }
                                     ?>
-                                >
-                            </div>
+                            >
+                            <label class="label" for="tree_view">
+                                Indicateur visuel de l’arborescence
+                            </label>
                         </div>
+                        <div class="field-body"></div>
                     </div>
 
                     <div class="field is-horizontal">

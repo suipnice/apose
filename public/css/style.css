@@ -1,6 +1,7 @@
 :root {
   --primary-color: #2E79C6;
   --secondary-color: #b9dcfa;
+  --body-background: #EEE;
 
   /* Bulma properties */
   --bulma-primary-h: 210;
@@ -13,7 +14,7 @@
 .table th {
   position: sticky;
   top: 0; /* Don't forget this, required for the stickiness */
-  background-color: #FFF;
+  /* background-color: #FFF; */
   box-shadow: 0 2px 2px -1px rgb(0 0 0 / 40%);
 }
 
@@ -47,14 +48,15 @@ body {
   font-size: 14px;
 }
 
-html,
-footer {
-  background-color: #EEE;
+html {
+  background-color: var(--bulma-text);
 }
 
+
 .container {
-  background-color: #FFF;
+  background-color: var(--bulma-body-background-color);
 }
+
 
 .is-test,
 .is-debug {
@@ -99,13 +101,18 @@ label {
 
 .option-recherche {
   padding: 0.8em;
-  background-color: #f2f2f2;
+  /*background-color: #f2f2f2;*/
 }
 
 /* Session styles */
 
 li[class^="sess-"] {
   padding-left:1em;
+}
+
+.sess-0,.sess-1,.sess-2,
+.sess-0 td,.sess-1 td,.sess-2 td {
+  color: #000;
 }
 
 .sess-0,
@@ -133,4 +140,18 @@ li[class^="sess-"] {
   font-weight: normal;
   font-style: italic;
   display: block;
+}
+
+@media (prefers-color-scheme:dark) {
+  :root{
+    --secondary-color: #236EB3;
+    --body-background: #404654;
+    --bulma-primary-l: 47%;
+  }
+
+  .sortable {
+    --stripe-color: #666;
+    --td-on-stripe-color: #FFF;
+    --td-color: #FFF;
+  }
 }

@@ -20,8 +20,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title><?php echo APP_NAME; ?> - <?php echo UNIV_NAME; ?></title>
     <link rel="stylesheet"
-        href="https://cdn.jsdelivr.net/npm/bulma@1.0.0/css/bulma.min.css"
+        href="https://cdn.jsdelivr.net/npm/bulma@1.0.2/css/bulma.min.css"
     >
+    <link rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bulma-switch@2.0.4/dist/css/bulma-switch.min.css"
+    >
+
     <link rel="stylesheet"
         href="https://cdn.jsdelivr.net/gh/tofsjonas/sortable@latest/sortable.min.css"
     >
