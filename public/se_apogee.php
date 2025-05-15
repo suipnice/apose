@@ -36,16 +36,36 @@ if (isset($_SESSION["authen"]) === false or $_SESSION["authen"] !== 'ok') {
     $comp = filter_input(INPUT_POST, "Liste_Comp");
     $cod_anu = filter_input(INPUT_POST, "cod_anu");
 
-    // Memorisation et prise en compte du choix des boutons radios lors du retour.
+    // Memorisation et prise en compte du choix des parametres lors du retour.
     $radio_numero = getPostInt('numero');
+
     $radio_ladd = getPostInt('ladd');
     $radio_charge = getPostInt('charge');
 
     $def_zero = ['options' => ['default' => 0]];
     $def_one = ['options' => ['default' => 1]];
 
-    $radio_epr = filter_var($_SESSION['epr'], FILTER_VALIDATE_INT, $def_zero);
-    $radio_ses = filter_var($_SESSION['cod_ses'], FILTER_VALIDATE_INT, $def_one);
+    if (isset($_SESSION['treeView']) === true) {
+        $treeView = filter_var(
+            $_SESSION['treeView'],
+            FILTER_VALIDATE_BOOLEAN
+        );
+    } else {
+        $treeView = false;
+    }
+
+    if (isset($_SESSION['epr']) === true) {
+        $radio_epr = filter_var($_SESSION['epr'], FILTER_VALIDATE_INT, $def_zero);
+    } else {
+        $radio_epr = 0;
+    }
+
+    if (isset($_SESSION['cod_ses']) === true) {
+        $radio_ses = filter_var($_SESSION['cod_ses'], FILTER_VALIDATE_INT, $def_one);
+    } else {
+        $radio_ses = 1;
+    }
+
     $res2 .= "<h3>Liste des années d’études disponibles sur APOGEE :</h3>";
 
     $res3 .= "<hr><h3>Liste des années d’études non modélisées sur APOGEE :</h3>";
@@ -196,7 +216,7 @@ if (isset($_SESSION["authen"]) === false or $_SESSION["authen"] !== 'ok') {
                     <div class="field is-horizontal">
                         <div class="field-label">
                             <span class="label">
-                                INDICATEUR NUMÉRIQUE DE L’ARBORESCENCE :
+                                Indicateur numérique de l’arborescence :
                             </span>
                         </div>
                         <div class="field-body">
@@ -216,10 +236,28 @@ if (isset($_SESSION["authen"]) === false or $_SESSION["authen"] !== 'ok') {
                             </div>
                         </div>
                     </div>
+
+                    <div class="field is-horizontal">
+                        <div class="field-label">
+                            <input type="checkbox" value="1" class="switch is-rounded"
+                                   name="treeView" id="tree_view"
+                                    <?php
+                                    if ($treeView === true) {
+                                        echo "checked";
+                                    }
+                                    ?>
+                            >
+                            <label class="label" for="tree_view">
+                                Indicateur visuel de l’arborescence
+                            </label>
+                        </div>
+                        <div class="field-body"></div>
+                    </div>
+
                     <div class="field is-horizontal">
                         <div class="field-label">
                             <span class="label">
-                                LIBELLÉS DE L’ANNEXE DESCRIPTIVE DU DIPLÔME :
+                                Libellés de l’annexe descriptive du diplôme :
                             </span>
                         </div>
                         <div class="field-body">
@@ -242,7 +280,7 @@ if (isset($_SESSION["authen"]) === false or $_SESSION["authen"] !== 'ok') {
                     </div>
                     <div class="field is-horizontal">
                         <div class="field-label">
-                            <span class="label">CHARGES D’ENSEIGNEMENTS :</span>
+                            <span class="label">Charges d’enseignements :</span>
                         </div>
                         <div class="field-body">
                             <div class="control">
@@ -263,7 +301,7 @@ if (isset($_SESSION["authen"]) === false or $_SESSION["authen"] !== 'ok') {
                     </div>
                     <div class="field is-horizontal">
                         <div class="field-label">
-                            <span class="label">INFORMATIONS DES ÉPREUVES :</span>
+                            <span class="label">Informations des épreuves :</span>
                         </div>
                         <div class="field-body">
                             <div class="control">
@@ -287,7 +325,7 @@ if (isset($_SESSION["authen"]) === false or $_SESSION["authen"] !== 'ok') {
                         echo "is-invisible";
                     } ?> ">
                         <div class="field-label">
-                            <span class="label p-2">SESSIONS :</span>
+                            <span class="label p-2">Sessions :</span>
                         </div>
                         <div class="field-body">
                             <div class="control">

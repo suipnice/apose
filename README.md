@@ -21,6 +21,14 @@ Utilisez le fichier `apose.sql` pour créer la structure de la base de données.
 Placez tout le contenu de ce dépôt sur votre serveur Web, mais partagez uniquement le dossier `public`, le dossier parent ne doit pas être accessible par le web.
 De manière générale, ne donnez jamais accès à un dossier .git directement sur le web.
 
+### Librairies tierces
+
+Vous aurez besoin de composer <https://getcomposer.org>.
+
+```sh
+php composer.phar install
+```
+
 ## PARAMÈTRES DE L'APPLICATION
 
 Copiez le fichier `param-dist.php` en `param.php` et modifiez-le pour configurer votre application.

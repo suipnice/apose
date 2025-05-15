@@ -6,11 +6,13 @@
  * @category Education
  * @package  Apose
  * @author   2014 - CRI Université Lille 2 <cri@univ-lille.fr>
- * @author   2021-2024 - UniCA DSI <dsi.sen@univ-cotedazur.fr>
+ * @author   2021-2025 - UniCA DSI <dsi.sen@univ-cotedazur.fr>
  * @author   2022 - Université Toulouse 1 Capitole <dsi@univ-tlse1.fr>
  * @license  GNU GPL
  * @link     https://github.com/suipnice/apose
  */
+
+require __DIR__ . '/../vendor/autoload.php';
 require "../param.php";
 
 
@@ -22,11 +24,45 @@ require "../param.php";
  *
  * @return int the param value
  */
-function getPostInt($param, $default = 0)
+function getPostInt($param, $default = 0): int
 {
     $def = ['options' => ['default' => $default]];
     return filter_input(INPUT_POST, $param, FILTER_VALIDATE_INT, $def);
+}
 
+
+/**
+ * Get param from POST and ensure it's a bool, with specified default value
+ *
+ * @param string $param   The param to get
+ * @param bool   $default The default value
+ *
+ * @return bool the param value
+ */
+function getPostBool($param, $default = false): bool
+{
+    $def = ['options' => ['default' => $default]];
+    return filter_input(INPUT_POST, $param, FILTER_VALIDATE_BOOLEAN, $def);
+}
+
+/**
+ * Affiche à l'utilisateur le message associé à une exception
+ *
+ * @param mixed $message Un message générique
+ * @param mixed $e       L'exception déclenchée
+ *
+ * @return void
+ */
+function printException($message, $e)
+{
+    // Gestion de l'erreur d'authentification CAS
+    include_once "../include/header.php";
+    echo "<div class=\"container mt-6\">";
+    echo "<div class=\"notification is-danger\">";
+    echo "$message : <pre>" . htmlspecialchars($e->getMessage());
+    echo "</pre></div></div>";
+    include_once "../include/footer.php";
+    error_log("$message: " . $e->getMessage());
 }
 
 
@@ -35,10 +71,8 @@ function getPostInt($param, $default = 0)
  *
  * @return string Affiliation principale de l’utilisateur
  */
-function authentificationCAS()
+function authentificationCAS(): string
 {
-    // Import de la librairie CAS.
-    include_once "../CAS.php";
     // Import des paramètres du serveur CAS.
     global $connexionCAS;
     global $logoutCas;
@@ -47,10 +81,11 @@ function authentificationCAS()
     $phpCAS = new phpCAS();
     if ($connexionCAS !== "active") {
         $phpCAS->client(
-            CAS_VERSION_2_0,
+            CAS_VERSION_3_0,
             CAS_HOST,
             CAS_PORT,
-            CAS_URI
+            CAS_URI,
+            SERVICE_BASE_URL
         );
         $connexionCAS = "active";
     }
@@ -61,7 +96,13 @@ function authentificationCAS()
 
     // Redirection vers la page d'authentification de CAS.
     $phpCAS->setNoCasServerValidation();
-    $phpCAS->forceAuthentication();
+    try {
+        $phpCAS->forceAuthentication();
+    } catch (CAS_AuthenticationException $e) {
+        // Gestion de l'erreur d'authentification CAS
+        printException("Échec de l’authentification CAS", $e);
+        exit;
+    }
 
     // L'utilisateur a été correctement identifié.
     $usernameCAS = $phpCAS->getUser();
@@ -71,7 +112,7 @@ function authentificationCAS()
 
     return $statut;
 
-}//end authentification_CAS()
+} //end authentification_CAS()
 
 
 /**
@@ -114,9 +155,15 @@ function identificationLDAP($login)
     // Lecture du resultat.
     $info = ldap_get_entries($conn, $result);
 
+    $prim_affiliation = "";
+
     for ($i = 0; $i < $info["count"]; $i++) {
         $uid = $info[$i]["uid"][0];
-        $supannetuid = $info[$i]["supannetuid"][0];
+        if (isset($info[$i]["supannetuid"]) === true) {
+            $supannetuid = $info[$i]["supannetuid"][0];
+        } else {
+            $supannetuid = "";
+        }
         $mail = $info[$i]["mail"][0];
         $username = $info[$i]["cn"][0];
         $prim_affiliation = $info[$i]["edupersonprimaryaffiliation"][0];
@@ -152,15 +199,14 @@ function connexionMysql(
     $user_mysql = USER_MYSQL,
     $passwd_mysql = PASSWD_MYSQL
 ) {
-    $link = mysqli_connect($hote_mysql, $user_mysql, $passwd_mysql, $base_mysql);
-    // Vérification de la connexion.
-    if (mysqli_connect_errno() === 0) {
-        return $link;
+    try {
+        $link = new mysqli($hote_mysql, $user_mysql, $passwd_mysql, $base_mysql);
+    } catch (mysqli_sql_exception $e) {
+        // Gestion de l'erreur d'authentification CAS
+        printException("Échec de la connexion BDD", $e);
+        exit;
     }
-
-    printf("Échec de la connexion : %s\n", mysqli_connect_error());
-    exit();
-
+    return $link;
 }
 
 
@@ -220,6 +266,32 @@ function etpLse($cnx_mysql, $cod_etp_cible, $cod_vrs_vet)
 
 }
 
+/**
+ * Génere une chaine de caracteres permettant d'afficher un niveau d'arbre en ASCII
+ *
+ * @param int  $niveau   Niveau actuel dans l'arbre
+ * @param bool $treeView Affichage de l'arbre
+ *
+ * @return string
+ */
+function getTabulation($niveau, $treeView=true): string
+{
+    $tabulation = "<span class='treeview niv_$niveau'>";
+    if ($treeView) {
+        for ($i = 2; $i < $niveau; $i++) {
+            $tabulation .= "│&nbsp;&nbsp;";
+        }
+        if ($niveau > 1) {
+            $tabulation .= "├─ ";
+        }
+    } else {
+        for ($i = 1; $i < $niveau; $i++) {
+            $tabulation .= "&nbsp;&nbsp;";
+        }
+    }
+    $tabulation .= "</span>";
+    return $tabulation;
+}
 
 /**
  * Recuperation des elp fils d'une liste d'une version d'etape
@@ -230,7 +302,8 @@ function etpLse($cnx_mysql, $cod_etp_cible, $cod_vrs_vet)
  * @param mixed  $cod_lse   cod_lse
  * @param mixed  $niveau    niveau
  * @param string $type      'Tableau' ou '?'
- * @param mixed  $numero    numero
+ * @param mixed  $numero    Affichage des numéros hierarchiques
+ * @param mixed  $treeView  Affichage visuel de la hierarchie
  * @param mixed  $res_tablo res_tablo
  *
  * @return mixed elp fils
@@ -243,12 +316,11 @@ function chercheElpFils(
     $niveau,
     $type = "tableau",
     $numero = 0,
+    $treeView = 1,
     $res_tablo = []
 ) {
     // GLOBAL $apogee;
     $res = "";
-    $tabulation1 = "";
-    $tabulation2 = "";
     $cod1 = "";
     $cod2 = "";
     // Libelle Annexe Descriptive du Diplome.
@@ -267,10 +339,7 @@ function chercheElpFils(
     ];
 
     if ($type === "tableau") {
-        for ($i = 1; $i < $niveau; $i++) {
-            $tabulation1 .= "&nbsp;&nbsp;&nbsp;";
-            $tabulation2 .= "";
-        }
+        $tabulation1 = getTabulation($niveau, $treeView);
         $tag = "td";
     } else {
         $tag = "span";
@@ -319,6 +388,7 @@ function chercheElpFils(
                 AND table_elp_nbetu.cod_etp = '$etp'
                 AND table_elp_nbetu.cod_vrs_etp = '$cod_vrs_vet'"
         );
+        $elp_nbetu = "";
         while (is_array($rnbip = mysqli_fetch_assoc($reqnbip)) === true) {
             $elp_nbetu = $rnbip['nb_etu_ip'];
         }
@@ -338,19 +408,16 @@ function chercheElpFils(
             $lib_elp = $fetched['lib_elp'];
         } //Fin if ladd
 
-        if ($type <> "tableau") {
-            $tabulation1 = "";
-        }
         if ($type === "tableau") {
-            $res .= "<tr><td>";
+            $res .= "<tr rel='$cod_elp'><td>";
         } else {
             $res .= "<li>";
         }
         // voir si fils
         $req2 = requete(
             $cnx_mysql,
-            "SELECT t1.cod_lse,t2.cod_typ_lse, t1.nbr_min_elp_obl_chx,
-                t1.nbr_max_elp_obl_chx
+            "SELECT t1.cod_lse, t2.cod_typ_lse, t1.nbr_min_elp_obl_chx,
+                t1.nbr_max_elp_obl_chx, t2.lib_lse
             FROM elp_regroupe_lse AS t1
             INNER JOIN liste_elp AS t2
                 ON t1.cod_lse=t2.cod_lse
@@ -386,24 +453,29 @@ function chercheElpFils(
                 $qcharg = $cnx_mysql->query($sql);
                 if ($qcharg->num_rows === 0) {
                     for ($n = 0; $n < $nbchg; $n++) {
-                        $affcharge = $affcharge . "<td class='no-charge'></td>";
+                        $affcharge .= "<$tag class='no-charge'></$tag>";
                     }
                 } else {
                     $index = 0;
-                    while (is_array($rcharg = mysqli_fetch_array($qcharg)) === true) {
+
+                    while (
+                        is_array($rcharg = mysqli_fetch_array($qcharg)) === true
+                    ) {
+
                         while (
                             strcmp($rcharg['COD_TYP_HEU'], $entetes[$index]) != 0
                         ) {
-                            $affcharge = $affcharge . "<td></td>";
-                            $index = $index + 1;
+                            $affcharge .= "<$tag></$tag>";
+                            $index++;
                         }
 
-                        $affcharge = "$affcharge<td rel='nb_heu'>
-                            " . $rcharg['NB_HEU_ELP'] . "</td>";
-                        $index = $index + 1;
+                        $affcharge .= "<$tag rel='nb_heu'>
+                            " . $rcharg['NB_HEU_ELP'] . "</$tag>";
+                        $index++;
+
                     }
                     for (; $index < $nbchg; $index++) {
-                        $affcharge = $affcharge . "<td></td>";
+                        $affcharge .= "<$tag></$tag>";
                     }
                 }
             }
@@ -419,12 +491,13 @@ function chercheElpFils(
             }
 
             $res .= "$tabulation1 $lib_niveau $tag1$lib_elp$tag2
-                     $tabulation2 <$tag rel='cod_elp'>$aff_cod_elp</$tag>
+                     <$tag rel='cod_elp'>$aff_cod_elp</$tag>
                      <$tag rel='cod_nel'>$cod_nel</$tag>
                      <$tag rel='cod_pel'>$cod_pel</$tag>
                      <$tag rel='nb_crd_elp'>$nbr_crd_elp</$tag>
                      <$tag rel='nbetu'>$elp_nbetu</$tag> $affcharge";
         } else {
+            // Type is not Table
             $res .= "$tabulation1 $lib_niveau $tag1$lib_elp$tag2";
         }
 
@@ -451,6 +524,20 @@ function chercheElpFils(
         // desc = 1 si il y a des fils/filles.
         if ($desc === 1) {
             foreach ($t_liste_lse_filles as $key => $r2) {
+                // Pour les elements fils suivants
+                if ($key > 0) {
+                    if ($type === "tableau") {
+                        $res .= "<tr rel='".$r2['cod_lse']."' class='liste_lse'>";
+                        $res .= "<td>";
+                        $res .= "$tabulation1 $tag1$lib_niveau".$r2['lib_lse'].$tag2;
+                        $res .= "</td><td></td><td>LISTE</td><td colspan='3'></td>";
+                        if ($charge === "1") {
+                            $res .= "<td colspan='3'></td>";
+                        }
+                    } else {
+                        $res .= "<li rel='".$r2['cod_lse']."'>";
+                    }
+                }
                 $max = $r2['nbr_max_elp_obl_chx'];
                 $min = $r2['nbr_min_elp_obl_chx'];
                 $cod_lse_aff = $r2['cod_lse'];
@@ -503,10 +590,10 @@ function chercheElpFils(
                         ORDER BY epr_sanctionne_elp.cod_ses,
                                  epreuve.lib_epr, epreuve.cod_epr"
                     );
+                    $tabulation2 = getTabulation($niveau+1, $treeView);
                     while (is_array($repr = mysqli_fetch_array($reqepr)) === true) {
                         $res .= "<tr class='sess-" . $repr[4] . "'>
-                            <td>$tabulation1$tabulation1
-                            &nbsp;&nbsp;&nbsp;&nbsp;" . $repr[1] . "</td>
+                            <td>$tabulation2 $lib_niveau" . $repr[1] . "</td>
                             <td>" . $repr[0] . "</td>
                             <td>" . $repr[2] . "</td>
                             <td>" . $repr[3] . "</td>
@@ -530,6 +617,7 @@ function chercheElpFils(
                         $niveau + 1,
                         $type,
                         $numero,
+                        $treeView,
                         $res_tablo
                     );
                 } else {
@@ -540,13 +628,13 @@ function chercheElpFils(
                         $r2['cod_lse'],
                         $niveau + 1,
                         $type,
-                        $numero
+                        $numero,
+                        $treeView
                     ) . "";
                 }
             }
-        }
-
-        if ($desc === 0) {
+        } else {
+            // desc = 0 ==> pas de fils/filles.
             if ($type === "tableau") {
                 $res .= "<$tag>&nbsp;</$tag><$tag>&nbsp;</$tag></tr>";
             } else {
@@ -554,7 +642,8 @@ function chercheElpFils(
             }
             if ($_SESSION['epr'] === 1) {
                 $cod_ses = $_SESSION['cod_ses'];
-                if ($cod_ses === 4) {//Affichage de toutes les sessions
+                if ($cod_ses === 4) {
+                    //Affichage de toutes les sessions
                     $critsess = '';
                 } else {
                     $critsess = "AND epr_sanctionne_elp.cod_ses='$cod_ses'";
@@ -572,10 +661,11 @@ function chercheElpFils(
                              epreuve.lib_epr, epreuve.cod_epr"
                 );
 
+                $tabulation2 = getTabulation($niveau+1, $treeView);
                 while ($repr = $reqepr->fetch_array()) {
                     $res .= "<tr class='sess-" . $repr[4] . "'>
-                            <td rel='repr1'>$tabulation1$tabulation1
-                            &nbsp;&nbsp;&nbsp;" . $repr[1] . "</td>
+                            <td rel='repr1'>$tabulation2 $lib_niveau
+                            " . $repr[1] . "</td>
                             <td rel='repr0'>" . $repr[0] . "</td>
                             <td rel='repr2'>" . $repr[2] . "</td>
                             <td rel='repr3'>" . $repr[3] . "</td>
@@ -586,7 +676,7 @@ function chercheElpFils(
                     $res .= "<td></td><td></td><td></td>";
                     $res .= "</tr>";
                 }
-            }//Fin If Affichage des sessions
+            } //Fin If Affichage des sessions
         }
 
     }

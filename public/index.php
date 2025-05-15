@@ -11,21 +11,14 @@
  * @license  GNU GPL
  * @link     https://github.com/suipnice/apose
  */
-require_once "../CAS.php";
 require "../include/fonctions.php";
 
 // On vérifie si la variable de session du profil est définie,
 // sinon on demande une authentification CAS.
 if (isset($_SESSION['authen']) === false) {
     $statut = authentificationCAS();
-    $authorized = [
-        "staff",
-        "teacher",
-        "faculty",
-        "researcher",
-        "employee"
-    ];
-    if (in_array($statut, $authorized) === true) {
+
+    if (in_array($statut, AUTHORIZED) === true) {
         $_SESSION['authen'] = "ok";
         // Redirection.
         echo '<meta http-equiv="Refresh" content="0;url=comp.php">';
@@ -53,5 +46,5 @@ if (isset($_SESSION['authen']) === false) {
             Contactez votre référent RH de proximité pour en savoir plus.</p>";
         echo "</div></div></div></div>";
         include "../include/footer.php";
-    }//end if authorized status
-}//end if isset(authen)
+    } //end if authorized status
+} //end if isset(authen)
