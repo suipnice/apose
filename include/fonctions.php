@@ -81,11 +81,11 @@ function authentificationCAS(): string
     $phpCAS = new phpCAS();
     if ($connexionCAS !== "active") {
         $phpCAS->client(
-            server_version: CAS_VERSION_3_0,
-            server_hostname: CAS_HOST,
-            server_port: CAS_PORT,
-            server_uri: CAS_URI,
-            service_base_url: SERVICE_BASE_URL
+            CAS_VERSION_3_0,
+            CAS_HOST,
+            CAS_PORT,
+            CAS_URI,
+            SERVICE_BASE_URL
         );
         $connexionCAS = "active";
     }
