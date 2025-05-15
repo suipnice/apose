@@ -49,7 +49,7 @@ body {
 }
 
 html {
-  background-color: var(--bulma-text);
+  background-color: var(--body-background);
 }
 
 
