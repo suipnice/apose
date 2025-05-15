@@ -50,9 +50,16 @@ define("USER_ORACLE", "apogee");
 define("NB_PREV_YEAR", 1);
 
 // PARAMETRES CAS.
+// Hostname of the CAS server
 define("CAS_HOST", "login.univ.fr");
+// The port the CAS server is running on
 define("CAS_PORT", 443);
+// The URI the CAS server is responding on
 define("CAS_URI", "");
+// The base URL (protocol, host and the optional port) of the CAS client;
+// pass in an array to use auto discovery with an allowlist;
+// Similar to serverName config in other CAS clients.
+define("SERVICE_BASE_URL", "");
 
 // PARAMETRES LDAP.
 define("LDAP_BASE_DN", "ou=people,dc=univ,dc=fr");

@@ -6,11 +6,13 @@
  * @category Education
  * @package  Apose
  * @author   2014 - CRI Université Lille 2 <cri@univ-lille.fr>
- * @author   2021-2024 - UniCA DSI <dsi.sen@univ-cotedazur.fr>
+ * @author   2021-2025 - UniCA DSI <dsi.sen@univ-cotedazur.fr>
  * @author   2022 - Université Toulouse 1 Capitole <dsi@univ-tlse1.fr>
  * @license  GNU GPL
  * @link     https://github.com/suipnice/apose
  */
+
+require __DIR__ . '/../vendor/autoload.php';
 require "../param.php";
 
 
@@ -28,6 +30,7 @@ function getPostInt($param, $default = 0): int
     return filter_input(INPUT_POST, $param, FILTER_VALIDATE_INT, $def);
 }
 
+
 /**
  * Get param from POST and ensure it's a bool, with specified default value
  *
@@ -42,16 +45,34 @@ function getPostBool($param, $default = false): bool
     return filter_input(INPUT_POST, $param, FILTER_VALIDATE_BOOLEAN, $def);
 }
 
+/**
+ * Affiche à l'utilisateur le message associé à une exception
+ *
+ * @param mixed $message Un message générique
+ * @param mixed $e       L'exception déclenchée
+ *
+ * @return void
+ */
+function printException($message, $e)
+{
+    // Gestion de l'erreur d'authentification CAS
+    include_once "../include/header.php";
+    echo "<div class=\"container mt-6\">";
+    echo "<div class=\"notification is-danger\">";
+    echo "$message : <pre>" . htmlspecialchars($e->getMessage());
+    echo "</pre></div></div>";
+    include_once "../include/footer.php";
+    error_log("$message: " . $e->getMessage());
+}
+
 
 /**
  * Authentification auprès d'un serveur CAS + LDAP
  *
  * @return string Affiliation principale de l’utilisateur
  */
-function authentificationCAS()
+function authentificationCAS(): string
 {
-    // Import de la librairie CAS.
-    include_once "../CAS.php";
     // Import des paramètres du serveur CAS.
     global $connexionCAS;
     global $logoutCas;
@@ -60,10 +81,11 @@ function authentificationCAS()
     $phpCAS = new phpCAS();
     if ($connexionCAS !== "active") {
         $phpCAS->client(
-            CAS_VERSION_2_0,
-            CAS_HOST,
-            CAS_PORT,
-            CAS_URI
+            server_version: CAS_VERSION_3_0,
+            server_hostname: CAS_HOST,
+            server_port: CAS_PORT,
+            server_uri: CAS_URI,
+            service_base_url: SERVICE_BASE_URL
         );
         $connexionCAS = "active";
     }
@@ -74,7 +96,13 @@ function authentificationCAS()
 
     // Redirection vers la page d'authentification de CAS.
     $phpCAS->setNoCasServerValidation();
-    $phpCAS->forceAuthentication();
+    try {
+        $phpCAS->forceAuthentication();
+    } catch (CAS_AuthenticationException $e) {
+        // Gestion de l'erreur d'authentification CAS
+        printException("Échec de l’authentification CAS", $e);
+        exit;
+    }
 
     // L'utilisateur a été correctement identifié.
     $usernameCAS = $phpCAS->getUser();
@@ -84,7 +112,7 @@ function authentificationCAS()
 
     return $statut;
 
-}//end authentification_CAS()
+} //end authentification_CAS()
 
 
 /**
@@ -126,6 +154,8 @@ function identificationLDAP($login)
 
     // Lecture du resultat.
     $info = ldap_get_entries($conn, $result);
+
+    $prim_affiliation = "";
 
     for ($i = 0; $i < $info["count"]; $i++) {
         $uid = $info[$i]["uid"][0];
@@ -169,9 +199,13 @@ function connexionMysql(
     $user_mysql = USER_MYSQL,
     $passwd_mysql = PASSWD_MYSQL
 ) {
-    $link = new mysqli($hote_mysql, $user_mysql, $passwd_mysql, $base_mysql) or die(
-        "Échec de la connexion : {$link->error}\n"
-    );
+    try {
+        $link = new mysqli($hote_mysql, $user_mysql, $passwd_mysql, $base_mysql);
+    } catch (mysqli_sql_exception $e) {
+        // Gestion de l'erreur d'authentification CAS
+        printException("Échec de la connexion BDD", $e);
+        exit;
+    }
     return $link;
 }
 
@@ -240,7 +274,8 @@ function etpLse($cnx_mysql, $cod_etp_cible, $cod_vrs_vet)
  *
  * @return string
  */
-function getTabulation($niveau, $treeView=true): string {
+function getTabulation($niveau, $treeView=true): string
+{
     $tabulation = "<span class='treeview niv_$niveau'>";
     if ($treeView) {
         for ($i = 2; $i < $niveau; $i++) {

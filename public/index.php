@@ -11,7 +11,6 @@
  * @license  GNU GPL
  * @link     https://github.com/suipnice/apose
  */
-require_once "../CAS.php";
 require "../include/fonctions.php";
 
 // On vérifie si la variable de session du profil est définie,
@@ -47,5 +46,5 @@ if (isset($_SESSION['authen']) === false) {
             Contactez votre référent RH de proximité pour en savoir plus.</p>";
         echo "</div></div></div></div>";
         include "../include/footer.php";
-    }//end if authorized status
-}//end if isset(authen)
+    } //end if authorized status
+} //end if isset(authen)
