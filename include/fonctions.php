@@ -457,9 +457,11 @@ function chercheElpFils(
                     }
                 } else {
                     $index = 0;
+
                     while (
                         is_array($rcharg = mysqli_fetch_array($qcharg)) === true
                     ) {
+
                         while (
                             strcmp($rcharg['COD_TYP_HEU'], $entetes[$index]) != 0
                         ) {
@@ -470,6 +472,7 @@ function chercheElpFils(
                         $affcharge .= "<$tag rel='nb_heu'>
                             " . $rcharg['NB_HEU_ELP'] . "</$tag>";
                         $index++;
+
                     }
                     for (; $index < $nbchg; $index++) {
                         $affcharge .= "<$tag></$tag>";
