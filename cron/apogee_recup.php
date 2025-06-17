@@ -92,7 +92,7 @@ if ($clean === true) {
     }
 }
 
-if (!$annee_uni) {
+if (isset($annee_uni) === false) {
     // On ne met pas à jour les tables transversales
     // lors d'une synchro d'année antérieure.
     printlog("Update composantes…");

@@ -468,7 +468,9 @@ function recupSimple(
                                ON DUPLICATE KEY UPDATE $updates;\n";
         } //end while
 
-        requete($cnx_mysql, $req_insert_sql, 0, "multi");
+        if ($req_insert_sql !== "") {
+            requete($cnx_mysql, $req_insert_sql, 0, "multi");
+        }
         requete($cnx_mysql, "unlock tables");
     } else {
         $err = oci_error();
