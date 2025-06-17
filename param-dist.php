@@ -45,8 +45,8 @@ define("BASE_ORACLE", "APOPROD");
 define("PASSWD_ORACLE", "A_CHANGER");
 define("USER_ORACLE", "apogee");
 
-// Nombre d'années précédentes à afficher
-// (1 pour l'an passé, 0 pour uniquement l'année courante).
+// Nombre d'années précédentes à afficher (et à synchro via cron)
+// (N pour ajouter N ans passés, 0 pour uniquement l'année courante et la suivante).
 define("NB_PREV_YEAR", 1);
 
 // PARAMETRES CAS.

@@ -55,13 +55,14 @@ function getPostBool($param, $default = false): bool
  */
 function printException($message, $e)
 {
-    // Gestion de l'erreur d'authentification CAS
-    include_once "../include/header.php";
-    echo "<div class=\"container mt-6\">";
-    echo "<div class=\"notification is-danger\">";
-    echo "$message : <pre>" . htmlspecialchars($e->getMessage());
-    echo "</pre></div></div>";
-    include_once "../include/footer.php";
+    if (php_sapi_name() !== 'cli') {
+        include_once "../include/header.php";
+        echo "<div class=\"container mt-6\">";
+        echo "<div class=\"notification is-danger\">";
+        echo "$message : <pre>" . htmlspecialchars($e->getMessage());
+        echo "</pre></div></div>";
+        include_once "../include/footer.php";
+    }
     error_log("$message: " . $e->getMessage());
 }
 
@@ -216,27 +217,36 @@ function connexionMysql(
  * @param mysqli $cnx_mysql Instanciated mysqli class
  * @param mixed  $libreq    Requete SQL à executer
  * @param int    $debug     Mode debug
+ * @param string $mode      "multi" for multiple requests on a single query
  *
  * @return mysqli_result
  */
-function requete($cnx_mysql, $libreq, $debug = 0)
+function requete($cnx_mysql, $libreq, $debug = 0, $mode = "")
 {
     debug($libreq);
-    $req = mysqli_query($cnx_mysql, $libreq);
+    if ($mode == "multi") {
+        $req = mysqli_multi_query($cnx_mysql, $libreq);
+    } else {
+        $req = mysqli_query($cnx_mysql, $libreq);
+    }
     if ($debug !== 0) {
         echo $libreq . '<br><br>';
     }
-
+    if ($mode == "multi") {
+        // Wait until multi query has properly ended.
+        while (mysqli_more_results($cnx_mysql) && mysqli_next_result($cnx_mysql)) {
+            ;
+        }
+    }
     if ($req !== false) {
         return $req;
     }
-    $erreur = "\nErreur requete\n";
+    $erreur = "\nErreur requête\n";
     // Pour le debug.
     $erreur .= $libreq . "\n" . MYSQLI_ERROR($cnx_mysql) . "\n";
 
     echo $erreur;
     die("UNE ERREUR A ÉTÉ RENCONTRÉE\n\n");
-
 }
 
 
@@ -712,9 +722,9 @@ function debug($value)
                 echo $value;
             }
         } else {
-            echo 'Aucun enregistrement';
+            echo "Aucun enregistrement";
         }
-        echo '</pre>';
+        echo "</pre>\n";
     }
 }
 
@@ -735,4 +745,17 @@ function getIconText($icon, $text)
         </span>
         <span>' . $text . '</span>
     </span>';
+}
+
+/**
+ * Print datetimed log
+ *
+ * @param mixed $log
+ *
+ * @return void
+ */
+function printlog($log) {
+    $date = new DateTime();
+    $date = $date->format("Y-m-d H:i:s");
+    print("$date -- $log\n");
 }

@@ -197,7 +197,8 @@ CREATE TABLE IF NOT EXISTS table_etape_nbetu (
   cod_etp varchar(6) NOT NULL DEFAULT '',
   cod_vrs_vet varchar(3) NOT NULL DEFAULT '',
   lib_etp varchar(120) NOT NULL DEFAULT '',
-  nb_etu varchar(6) NOT NULL DEFAULT ''
+  nb_etu varchar(6) NOT NULL DEFAULT '',
+  PRIMARY KEY (cod_anu,cod_etp,cod_vrs_vet)
 );
 
 -- --------------------------------------------------------
