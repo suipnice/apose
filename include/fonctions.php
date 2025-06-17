@@ -24,18 +24,13 @@ require "../param.php";
  *
  * @return int the param value
  */
-function getPostInt($param, $default = 0): int
+function getPostInt($param, $default=0): int
 {
     $def = ['options' => ['default' => $default]];
     return filter_input(INPUT_POST, $param, FILTER_VALIDATE_INT, $def);
 }
-<<<<<<< develop
 
 
-=======
-
-
->>>>>>> master
 /**
  * Get param from POST and ensure it's a bool, with specified default value
  *
@@ -44,41 +39,32 @@ function getPostInt($param, $default = 0): int
  *
  * @return bool the param value
  */
-function getPostBool($param, $default = false): bool
+function getPostBool($param, $default=false): bool
 {
     $def = ['options' => ['default' => $default]];
     return filter_input(INPUT_POST, $param, FILTER_VALIDATE_BOOLEAN, $def);
 }
 
+
 /**
  * Affiche à l'utilisateur le message associé à une exception
  *
- * @param mixed $message Un message générique
- * @param mixed $e       L'exception déclenchée
+ * @param mixed $message   Un message générique
+ * @param mixed $exception L'exception déclenchée
  *
  * @return void
  */
-function printException($message, $e)
+function printException($message, $exception)
 {
-<<<<<<< develop
     if (php_sapi_name() !== 'cli') {
         include_once "../include/header.php";
         echo "<div class=\"container mt-6\">";
         echo "<div class=\"notification is-danger\">";
-        echo "$message : <pre>" . htmlspecialchars($e->getMessage());
+        echo "$message : <pre>" . htmlspecialchars($exception->getMessage());
         echo "</pre></div></div>";
         include_once "../include/footer.php";
     }
-=======
-    // Gestion de l'erreur d'authentification CAS
-    include_once "../include/header.php";
-    echo "<div class=\"container mt-6\">";
-    echo "<div class=\"notification is-danger\">";
-    echo "$message : <pre>" . htmlspecialchars($e->getMessage());
-    echo "</pre></div></div>";
-    include_once "../include/footer.php";
->>>>>>> master
-    error_log("$message: " . $e->getMessage());
+    error_log("$message: " . $exception->getMessage());
 }
 
 
@@ -115,7 +101,7 @@ function authentificationCAS(): string
     try {
         $phpCAS->forceAuthentication();
     } catch (CAS_AuthenticationException $e) {
-        // Gestion de l'erreur d'authentification CAS
+        // Gestion de l'erreur d'authentification CAS.
         printException("Échec de l’authentification CAS", $e);
         exit;
     }
@@ -218,7 +204,6 @@ function connexionMysql(
     try {
         $link = new mysqli($hote_mysql, $user_mysql, $passwd_mysql, $base_mysql);
     } catch (mysqli_sql_exception $e) {
-        // Gestion de l'erreur d'authentification CAS
         printException("Échec de la connexion BDD", $e);
         exit;
     }
@@ -549,6 +534,7 @@ function chercheElpFils(
         // desc = 1 si il y a des fils/filles.
         if ($desc === 1) {
             foreach ($t_liste_lse_filles as $key => $r2) {
+                // TODO : aller à la ligne quand il y a plus d'une fille ?
                 // Pour les elements fils suivants
                 if ($key > 0) {
                     if ($type === "tableau") {

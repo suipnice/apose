@@ -438,9 +438,11 @@ function recupSimple(
                 // Renomme certaines colonnes différentes entre APOGEE et APOSE
                 // On ne pourra utiliser match() qu'en php 8.
                 // En attendant, faut faire du switch.
-                /* $cle = match ($cle) {
+                /*
+                $cle = match ($cle) {
                     "LIB_WEB_VET" => "lib_etp",
-                }; */
+                };
+                */
                 switch ($cle) {
                 case "LIB_WEB_VET":
                     $cle = "lib_etp";
