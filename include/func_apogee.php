@@ -381,24 +381,23 @@ function queryTableTypHeure()
 
 
 /**
- * [Description for recupSimple]
+ * Récupère des données Oracle et les injecte dans une table MySQL
  *
- * @param mysqli $cnx_mysql       Connexion à la base Mysql
- * @param mixed  $cnx_oracle      Connexion à la base Oracle
- * @param mixed  $nom_table_mysql Nom de la table
- * @param string $lib_query       Requete SQL
+ * @param mysqli $cnx_mysql   Connexion à la base Mysql
+ * @param mixed  $cnx_oracle  Connexion à la base Oracle
+ * @param mixed  $table_mysql Nom de la table
+ * @param string $lib_query   Requete SQL
  *
  * @return [type]
  */
 function recupSimple(
     $cnx_mysql,
     $cnx_oracle,
-    $nom_table_mysql,
+    $table_mysql,
     $lib_query
 ) {
     // Fonction de debug, verifier si debug YES dans param.php.
-    debug("table " . $nom_table_mysql . "<br><br>" . $lib_query);
-
+    debug("table $table_mysql <br><br> $lib_query");
     // 10min
     set_time_limit(600);
     $cursor = oci_parse($cnx_oracle, $lib_query);
@@ -407,15 +406,17 @@ function recupSimple(
 
     if ($cursor !== false and is_array($result) === true) {
         $result = oci_execute($cursor);
-        requete($cnx_mysql, "lock tables $nom_table_mysql write");
 
+        printlog("…APOGEE fetched. Inserting in $table_mysql …");
+        requete($cnx_mysql, "lock tables $table_mysql write");
+        $req_insert_sql = "";
         while (is_object($row = oci_fetch_object($cursor)) === true) {
             $sql = "'";
-            $keys = [];
+            $updates = [];
             foreach ($row as $cle => $valeur) {
                 $valeur = str_replace(",", ".", $valeur);
 
-                // Colonnes qui doivent numériques plutôt que chaine vide ''.
+                // Colonnes qui doivent être numériques plutôt que chaine vide ''.
                 $num_cols = [
                     "NBR_VOL_ELP",
                     "NB_HEU_ELP"
@@ -426,25 +427,52 @@ function recupSimple(
 
                 // Colonnes qui doivent être NULL plutot que chaine vide ''.
                 if (in_array($cle, ["NB_HEU"]) and $valeur === '') {
+                    $valeur = "NULL";
                     // Retire "'" à la fin.
                     $sql = substr($sql, 0, -1);
-                    $sql .= "NULL,'";
+                    $sql .= "$valeur,'";
                 } else {
-                    $sql .= str_replace("'", "\\'", $valeur) . "','";
+                    $valeur = str_replace("'", "\\'", $valeur);
+                    $sql .= "$valeur','";
                 }
-
-                $keys[] = $cle;
+                // Renomme certaines colonnes différentes entre APOGEE et APOSE
+                // On ne pourra utiliser match() qu'en php 8.
+                // En attendant, faut faire du switch.
+                /*
+                $cle = match ($cle) {
+                    "LIB_WEB_VET" => "lib_etp",
+                };
+                */
+                switch ($cle) {
+                case "LIB_WEB_VET":
+                    $cle = "lib_etp";
+                    break;
+                case "COD_VRS_VET":
+                    if ($table_mysql === "table_elp_nbetu") {
+                        $cle = "cod_vrs_etp";
+                    }
+                    break;
+                case "NBR_MAX_ELP_OBL_CHX_VET":
+                    $cle = "nbr_max_elp_obl_chx";
+                    break;
+                case "NBR_MIN_ELP_OBL_CHX_VET":
+                    $cle = "nbr_min_elp_obl_chx";
+                    break;
+                }
+                $updates[] = "`{$cle}` = '{$valeur}'";
             }
             // Enleve les 2 caracteres à la fin (,').
             $sql = substr($sql, 0, -2);
-            $keys = implode(",", $keys);
+            $updates = implode(",", $updates);
 
-            $req_insert_sql = "INSERT INTO " . $nom_table_mysql . "
-                               VALUES(" . $sql . ")";
+            $req_insert_sql .= "INSERT INTO $table_mysql
+                               VALUES($sql)
+                               ON DUPLICATE KEY UPDATE $updates;\n";
+        } //end while
 
-            requete($cnx_mysql, $req_insert_sql);
-        }//end while
-
+        if ($req_insert_sql !== "") {
+            requete($cnx_mysql, $req_insert_sql, 0, "multi");
+        }
         requete($cnx_mysql, "unlock tables");
     } else {
         $err = oci_error();

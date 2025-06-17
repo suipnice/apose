@@ -45,16 +45,16 @@ define("BASE_ORACLE", "APOPROD");
 define("PASSWD_ORACLE", "A_CHANGER");
 define("USER_ORACLE", "apogee");
 
-// Nombre d'années précédentes à afficher
-// (1 pour l'an passé, 0 pour uniquement l'année courante).
+// Nombre d'années précédentes à afficher (et à synchro via cron)
+// (N pour ajouter N ans passés, 0 pour uniquement l'année courante et la suivante).
 define("NB_PREV_YEAR", 1);
 
 // PARAMETRES CAS.
-// Hostname of the CAS server
+// Hostname of the CAS server.
 define("CAS_HOST", "login.univ.fr");
-// The port the CAS server is running on
+// The port the CAS server is running on.
 define("CAS_PORT", 443);
-// The URI the CAS server is responding on
+// The URI the CAS server is responding on.
 define("CAS_URI", "");
 // The base URL (protocol, host and the optional port) of the CAS client;
 // pass in an array to use auto discovery with an allowlist;
