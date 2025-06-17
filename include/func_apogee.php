@@ -409,6 +409,7 @@ function recupSimple(
 
         printlog("…APOGEE fetched. Inserting in $table_mysql …");
         requete($cnx_mysql, "lock tables $table_mysql write");
+        $req_insert_sql = "";
         while (is_object($row = oci_fetch_object($cursor)) === true) {
             $sql = "'";
             $updates = [];
