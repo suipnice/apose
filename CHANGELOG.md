@@ -1,5 +1,11 @@
 # Apose Change log
 
+## 2025
+
+v25.06 - New version by UniCA - DSI SEN :
+
+* Optimize cron with multi inserts
+
 ## 2024
 
 v24.06 - New version by UniCA - DSI SEN :
