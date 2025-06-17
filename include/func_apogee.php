@@ -406,9 +406,9 @@ function recupSimple(
 
     if ($cursor !== false and is_array($result) === true) {
         $result = oci_execute($cursor);
-        requete($cnx_mysql, "lock tables $nom_table_mysql write");
 
         printlog("…APOGEE fetched. Inserting in $table_mysql …");
+        requete($cnx_mysql, "lock tables $table_mysql write");
         while (is_object($row = oci_fetch_object($cursor)) === true) {
             $sql = "'";
             $updates = [];
