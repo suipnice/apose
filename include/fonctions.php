@@ -29,8 +29,13 @@ function getPostInt($param, $default = 0): int
     $def = ['options' => ['default' => $default]];
     return filter_input(INPUT_POST, $param, FILTER_VALIDATE_INT, $def);
 }
+<<<<<<< develop
 
 
+=======
+
+
+>>>>>>> master
 /**
  * Get param from POST and ensure it's a bool, with specified default value
  *
@@ -55,6 +60,7 @@ function getPostBool($param, $default = false): bool
  */
 function printException($message, $e)
 {
+<<<<<<< develop
     if (php_sapi_name() !== 'cli') {
         include_once "../include/header.php";
         echo "<div class=\"container mt-6\">";
@@ -63,6 +69,15 @@ function printException($message, $e)
         echo "</pre></div></div>";
         include_once "../include/footer.php";
     }
+=======
+    // Gestion de l'erreur d'authentification CAS
+    include_once "../include/header.php";
+    echo "<div class=\"container mt-6\">";
+    echo "<div class=\"notification is-danger\">";
+    echo "$message : <pre>" . htmlspecialchars($e->getMessage());
+    echo "</pre></div></div>";
+    include_once "../include/footer.php";
+>>>>>>> master
     error_log("$message: " . $e->getMessage());
 }
 

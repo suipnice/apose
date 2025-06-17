@@ -1,15 +1,23 @@
 :root {
+<<<<<<< develop
   --primary-color: hsl(210deg 62% 47%);
   --secondary-color: hsl(210deg 62% 85%);
+=======
+  --primary-color: #2E79C6;
+  --secondary-color: #b9dcfa;
+>>>>>>> master
   --body-background: #EEE;
 
   /* Bulma properties */
   --bulma-primary-h: 210;
   --bulma-primary-s: 62%;
   --bulma-primary-l: 47%;
+<<<<<<< develop
   --bulma-link-h: 210;
   --bulma-link-s: 62%;
   --bulma-link-l: 47%;
+=======
+>>>>>>> master
   --bulma-primary-invert-l: var(--bulma-primary-100-l);
 }
 
