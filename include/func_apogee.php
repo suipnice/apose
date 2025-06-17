@@ -436,16 +436,16 @@ function recupSimple(
                 }
                 // Renomme certaines colonnes différentes entre APOGEE et APOSE
                 // On ne pourra utiliser match() qu'en php 8.
-                // En attendant, faut faire du switch
-                /*$cle = match ($cle) {
+                // En attendant, faut faire du switch.
+                /* $cle = match ($cle) {
                     "LIB_WEB_VET" => "lib_etp",
-                };*/
+                }; */
                 switch ($cle) {
                 case "LIB_WEB_VET":
                     $cle = "lib_etp";
                     break;
                 case "COD_VRS_VET":
-                    if ($table_mysql == "table_elp_nbetu") {
+                    if ($table_mysql === "table_elp_nbetu") {
                         $cle = "cod_vrs_etp";
                     }
                     break;
@@ -466,6 +466,7 @@ function recupSimple(
                                VALUES($sql)
                                ON DUPLICATE KEY UPDATE $updates;\n";
         } //end while
+
         requete($cnx_mysql, $req_insert_sql, 0, "multi");
         requete($cnx_mysql, "unlock tables");
     } else {

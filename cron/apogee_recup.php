@@ -35,7 +35,7 @@ if (php_sapi_name() !== 'cli') {
     $long_options = ["annee:"];
     $options = getopt($short_options, $long_options);
 
-    if (isset($options["a"]) || isset($options["annee"])) {
+    if (isset($options["a"]) === true || isset($options["annee"]) === true) {
         $annee_uni = $options["a"] ?? $options["annee"];
     }
 }
@@ -46,11 +46,11 @@ $cnx_mysql = connexionMysql();
 printlog("Connexion Oracle.");
 $cnx = connexionOracle();
 
-if (!$annee_uni) {
-    // clean = true to delete all existing entries before inserts
+if (isset($annee_uni) === false) {
+    // Set clean = true to delete all existing entries before inserts.
     $clean = true;
 
-    // Si l'année n'est pas définie, on demande l'année courante à APOGEE
+    // Si l'année n'est pas définie, on demande l'année courante à APOGEE.
     printlog("Fetch annee_uni from APOGEE…");
     requete($cnx_mysql, "DELETE FROM annee_uni");
     recupSimple($cnx_mysql, $cnx, "annee_uni", queryAnneeUniApoOuverte());
@@ -64,7 +64,7 @@ if (!$annee_uni) {
         $tab_annees[] = $enra["cod_anu"];
     }
 } else {
-    // Do not delete existing entries before inserts
+    // Do not delete existing entries before inserts.
     $clean = false;
     $tab_annees = [$annee_uni];
 
@@ -74,8 +74,7 @@ if (!$annee_uni) {
     requete($cnx_mysql, $req_insert_sql);
 }
 
-
-if ($clean) {
+if ($clean === true) {
     $tables = [
         "composante",
         "epreuve",
@@ -95,7 +94,7 @@ if ($clean) {
 
 if (!$annee_uni) {
     // On ne met pas à jour les tables transversales
-    //  lors d'une synchro d'année antérieure
+    // lors d'une synchro d'année antérieure.
     printlog("Update composantes…");
     recupSimple($cnx_mysql, $cnx, "composante", queryComposante());
     printlog("Fetch epreuves…");
