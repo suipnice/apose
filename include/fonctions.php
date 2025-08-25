@@ -201,6 +201,7 @@ function connexionMysql(
     $user_mysql = USER_MYSQL,
     $passwd_mysql = PASSWD_MYSQL
 ) {
+    mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
     try {
         $link = new mysqli($hote_mysql, $user_mysql, $passwd_mysql, $base_mysql);
     } catch (mysqli_sql_exception $e) {
@@ -226,21 +227,59 @@ function requete($cnx_mysql, $libreq, $debug = 0, $mode = "")
     debug($libreq);
     if ($mode == "multi") {
         $req = mysqli_multi_query($cnx_mysql, $libreq);
+
+        if ($req) {
+            // Comptage du nombre de lignes insérées
+            $totalInserted = 0;
+            do {
+                if ($result = mysqli_store_result($cnx_mysql)) {
+                    // SELECT, ignore
+                    mysqli_free_result($result);
+                } else {
+                    // Pour INSERT, UPDATE, DELETE
+                    $affected = mysqli_affected_rows($cnx_mysql);
+                    if ($affected > 0) {
+                        $totalInserted += $affected;
+                    } else {
+                        report_error($cnx_mysql, $libreq);
+                    }
+                }
+            } while (mysqli_more_results($cnx_mysql) && mysqli_next_result($cnx_mysql));
+            printlog("Nombre de lignes insérées/affectées : $totalInserted");
+
+            // Check for MySQL warnings after each query
+            $warnings = $cnx_mysql->query("SHOW WARNINGS");
+            if ($warnings && $warnings->num_rows > 0) {
+                printlog("MySQL Warnings detected:");
+                while ($row = $warnings->fetch_assoc()) {
+                    echo implode(" | ", $row) . "\n";
+                }
+                die("Script interrompu à cause d'un warning MySQL.\n");
+            }
+        } else {
+            reportError($cnx_mysql, $libreq);
+        }
     } else {
         $req = mysqli_query($cnx_mysql, $libreq);
     }
     if ($debug !== 0) {
         echo $libreq . '<br><br>';
     }
-    if ($mode == "multi") {
-        // Wait until multi query has properly ended.
-        while (mysqli_more_results($cnx_mysql) && mysqli_next_result($cnx_mysql)) {
-            ;
-        }
-    }
+
     if ($req !== false) {
         return $req;
     }
+    reportError($cnx_mysql, $libreq);
+}
+
+/**
+ * Arrete le sript et affiche un détail de l'erreur.
+ *
+ * @param mixed $cnx_mysql
+ * @param mixed $libreq
+ * @return never
+ */
+function reportError($cnx_mysql, $libreq){
     $erreur = "\nErreur requête\n";
     // Pour le debug.
     $erreur .= $libreq . "\n" . MYSQLI_ERROR($cnx_mysql) . "\n";

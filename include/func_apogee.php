@@ -291,33 +291,33 @@ FROM APOGEE.lse_regroupe_elp";
 
 
 /**
- * [Description for queryTableElp]
+ * Recupere depuis APOGEE les infos nécessaires à la table locale des ELP
  *
- * @return [type]
+ * @return string
  */
 function queryTableElp()
 {
-    $query = "SELECT APOGEE.ELEMENT_PEDAGOGI.COD_ELP,
-  APOGEE.ELEMENT_PEDAGOGI.LIC_ELP,
-  APOGEE.ELEMENT_PEDAGOGI.LIB_ELP,
-  APOGEE.ELEMENT_PEDAGOGI.COD_NEL,
-  APOGEE.ELEMENT_PEDAGOGI.COD_PEL,
-  APOGEE.ELEMENT_PEDAGOGI.TEM_ADI,
-  APOGEE.ELEMENT_PEDAGOGI.TEM_ADO,
-  APOGEE.ELEMENT_PEDAGOGI.NBR_CRD_ELP,
-  APOGEE.ELP_LIBELLE.LIB_ELP_LNG,
-  APOGEE.ELEMENT_PEDAGOGI.NBR_VOL_ELP,
-  APOGEE.ELEMENT_PEDAGOGI.COD_VOL_ELP,
-  APOGEE.ELEMENT_PEDAGOGI.TEM_MCC_ELP
+    $query = "SELECT ELEMENT_PEDAGOGI.COD_ELP,
+  ELEMENT_PEDAGOGI.LIC_ELP,
+  ELEMENT_PEDAGOGI.LIB_ELP,
+  ELEMENT_PEDAGOGI.COD_NEL,
+  ELEMENT_PEDAGOGI.COD_PEL,
+  ELEMENT_PEDAGOGI.TEM_ADI,
+  ELEMENT_PEDAGOGI.TEM_ADO,
+  ELEMENT_PEDAGOGI.NBR_CRD_ELP,
+  ELP_LIBELLE.LIB_ELP_LNG,
+  ELEMENT_PEDAGOGI.NBR_VOL_ELP,
+  ELEMENT_PEDAGOGI.COD_VOL_ELP,
+  ELEMENT_PEDAGOGI.TEM_MCC_ELP,
+  ELEMENT_PEDAGOGI.LIB_CMT_ELP
   FROM APOGEE.ELEMENT_PEDAGOGI
   LEFT JOIN APOGEE.ELP_LIBELLE
-  ON APOGEE.ELEMENT_PEDAGOGI.COD_ELP=APOGEE.ELP_LIBELLE.COD_ELP
-  WHERE APOGEE.ELEMENT_PEDAGOGI.TEM_SUS_ELP = 'N'
-  AND APOGEE.ELEMENT_PEDAGOGI.ETA_ELP='O'
-  AND (APOGEE.ELP_LIBELLE.COD_LNG='FRAN'
-  OR APOGEE.ELP_LIBELLE.COD_LNG IS NULL)";
+  ON ELEMENT_PEDAGOGI.COD_ELP=ELP_LIBELLE.COD_ELP
+  WHERE ELEMENT_PEDAGOGI.TEM_SUS_ELP = 'N'
+  AND ELEMENT_PEDAGOGI.ETA_ELP='O'
+  AND (ELP_LIBELLE.COD_LNG='FRAN'
+  OR ELP_LIBELLE.COD_LNG IS NULL)";
     return $query;
-
 }
 
 
@@ -410,11 +410,25 @@ function recupSimple(
         printlog("…APOGEE fetched. Inserting in $table_mysql …");
         requete($cnx_mysql, "lock tables $table_mysql write");
         $req_insert_sql = "";
+        $nbrows = 0;
         while (is_object($row = oci_fetch_object($cursor)) === true) {
             $sql = "'";
             $updates = [];
+            $nbrows = $nbrows +1;
             foreach ($row as $cle => $valeur) {
                 $valeur = str_replace(",", ".", $valeur);
+
+                // Chars to be replaced
+                $wrong_chars   = ["\r\n", "\n", "\r"];
+                $replace = ' ';
+
+                // Replace wrong chars by simple space
+                $valeur = str_replace($wrong_chars, $replace, $valeur);
+
+                if ($cle != "COD_ELP") {
+                    // Attention certains collent un espace insécable dans leur code ELP !
+                    $valeur= trim($valeur);
+                }
 
                 // Colonnes qui doivent être numériques plutôt que chaine vide ''.
                 $num_cols = [
@@ -443,6 +457,7 @@ function recupSimple(
                     "LIB_WEB_VET" => "lib_etp",
                 };
                 */
+
                 switch ($cle) {
                 case "LIB_WEB_VET":
                     $cle = "lib_etp";
@@ -470,8 +485,34 @@ function recupSimple(
                                ON DUPLICATE KEY UPDATE $updates;\n";
         } //end while
 
+        printlog("Fetched rows: $nbrows");
+
         if ($req_insert_sql !== "") {
-            requete($cnx_mysql, $req_insert_sql, 0, "multi");
+            $myfile = fopen("req_insert_$table_mysql.sql", "w") or die("Unable to open file!");
+            fwrite($myfile, $req_insert_sql);
+            fclose($myfile);
+
+            // Découpe la requête en paquets de 10 000 lignes max
+            $inserts = explode(";\n", $req_insert_sql);
+            $batch = [];
+            $count = 0;
+            foreach ($inserts as $insert) {
+                // Ignore les lignes vides.
+                if (trim($insert) === "") {
+                    continue;
+                }
+                $batch[] = $insert . ";";
+                $count++;
+                if ($count === 10000) {
+                    requete($cnx_mysql, implode("\n", $batch), 0, "multi");
+                    $batch = [];
+                    $count = 0;
+                }
+            }
+            // Envoie le reste
+            if (!empty($batch)) {
+                //requete($cnx_mysql, implode("\n", $batch), 0, "multi");
+            }
         }
         requete($cnx_mysql, "unlock tables");
     } else {
