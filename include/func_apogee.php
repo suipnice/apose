@@ -511,7 +511,7 @@ function recupSimple(
             }
             // Envoie le reste
             if (!empty($batch)) {
-                //requete($cnx_mysql, implode("\n", $batch), 0, "multi");
+                requete($cnx_mysql, implode("\n", $batch), 0, "multi");
             }
         }
         requete($cnx_mysql, "unlock tables");

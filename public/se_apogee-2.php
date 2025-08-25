@@ -190,6 +190,7 @@ if (isset($_SESSION["authen"]) === false or $_SESSION["authen"] !== 'ok') {
                             " . $libcharge . "
                             <th scope='col'>Code liste</th>
                             <th scope='col'>Observations</th>
+                            <th scope='col'>Commentaires</th>
                         </tr></thead>";
             } else {
                 $res2 .= "<p>$cod_lse&nbsp;: $lib_liste</p>";
