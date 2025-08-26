@@ -414,20 +414,24 @@ function recupSimple(
         while (is_object($row = oci_fetch_object($cursor)) === true) {
             $sql = "'";
             $updates = [];
-            $nbrows = $nbrows +1;
+            $nbrows = $nbrows + 1;
             foreach ($row as $cle => $valeur) {
                 $valeur = str_replace(",", ".", $valeur);
 
-                // Chars to be replaced
-                $wrong_chars   = ["\r\n", "\n", "\r"];
+                // Chars to be replaced.
+                $wrong_chars = [
+                    "\r\n",
+                    "\n",
+                    "\r"
+                ];
                 $replace = ' ';
 
-                // Replace wrong chars by simple space
+                // Replace wrong chars by simple space.
                 $valeur = str_replace($wrong_chars, $replace, $valeur);
 
-                if ($cle != "COD_ELP") {
-                    // Attention certains collent un espace insécable dans leur code ELP !
-                    $valeur= trim($valeur);
+                if ($cle !== "COD_ELP") {
+                    // Attention certains collent un espace insécable dans le code !
+                    $valeur = trim($valeur);
                 }
 
                 // Colonnes qui doivent être numériques plutôt que chaine vide ''.
@@ -509,8 +513,8 @@ function recupSimple(
                     $count = 0;
                 }
             }
-            // Envoie le reste
-            if (!empty($batch)) {
+            // Envoie le reste.
+            if (empty($batch) === FALSE) {
                 requete($cnx_mysql, implode("\n", $batch), 0, "multi");
             }
         }

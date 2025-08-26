@@ -228,7 +228,7 @@ function requete($cnx_mysql, $libreq, $debug = 0, $mode = "")
     if ($mode == "multi") {
         $req = mysqli_multi_query($cnx_mysql, $libreq);
 
-        if ($req) {
+        if ($req === TRUE) {
             // Comptage du nombre de lignes insérées
             $totalInserted = 0;
             do {

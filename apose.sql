@@ -150,7 +150,7 @@ CREATE TABLE IF NOT EXISTS table_elp (
   nbr_vol_elp decimal(10,1) NOT NULL,
   cod_vol_elp varchar(2) NOT NULL,
   tem_mcc_elp varchar(1) NOT NULL,
-  lib_cmt_elp varchar(1000) NOT NULL DEFAULT '',
+  lib_cmt_elp varchar(2000) NOT NULL DEFAULT '',
   PRIMARY KEY (cod_elp)
 );
 
