@@ -12,6 +12,7 @@
  * @link     https://github.com/suipnice/apose
  */
 
+require_once "fonctions.php";
 
 /**
  * Connect to an Oracle database
@@ -270,7 +271,7 @@ function queryElpRegroupeLse()
 function queryListes()
 {
     $query = "SELECT COD_LSE,COD_TYP_LSE,ETA_LSE,LIC_LSE,LIB_LSE
-FROM APOGEE.liste_elp ";
+FROM APOGEE.liste_elp";
     return $query;
 
 }
@@ -430,8 +431,8 @@ function recupSimple(
                 $valeur = str_replace($wrong_chars, $replace, $valeur);
 
                 if ($cle !== "COD_ELP") {
-                    // Attention certains collent un espace insécable dans le code !
-                    $valeur = trim($valeur);
+                    // Attention certains collent un espace insécable dans leur code ELP !
+                    $valeur= underscore_spaces($valeur);
                 }
 
                 // Colonnes qui doivent être numériques plutôt que chaine vide ''.

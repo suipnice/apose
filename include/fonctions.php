@@ -812,3 +812,17 @@ function printlog($log) {
     $date = $date->format("Y-m-d H:i:s");
     print("$date -- $log\n");
 }
+
+
+/**
+ * Fonction similaire à trim(), mais remplace les espaces au début et à la fin par des underscores.
+ * Remplace tous les espaces consécutifs au début par un '_', et à la fin par un '_'.
+ *
+ * @param string $string La chaîne à traiter.
+ * @return string La chaîne avec les espaces au début et à la fin remplacés par '_'.
+ */
+function underscore_spaces($string) {
+    $string = preg_replace('/^\s+/', '_', $string);
+    $string = preg_replace('/\s+$/', '_', $string);
+    return $string;
+}
