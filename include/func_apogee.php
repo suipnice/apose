@@ -422,11 +422,7 @@ function recupSimple(
                 $valeur = str_replace(",", ".", $valeur);
 
                 // Chars to be replaced.
-                $wrong_chars = [
-                    "\r\n",
-                    "\n",
-                    "\r"
-                ];
+                $wrong_chars = ["\r\n", "\n", "\r"];
                 $replace = ' ';
 
                 // Replace wrong chars by simple space.
@@ -499,7 +495,7 @@ function recupSimple(
             fwrite($myfile, $req_insert_sql);
             fclose($myfile);
 
-            // Découpe la requête en paquets de 10 000 lignes max
+            // Découpe la requête en paquets de 10 000 lignes max.
             $inserts = explode(";\n", $req_insert_sql);
             $batch = [];
             $count = 0;
