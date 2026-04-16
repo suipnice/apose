@@ -171,9 +171,11 @@ function queryEprSanctionneElp()
  */
 function queryComposante()
 {
+    // BSC = Services Communs
+    // La composante BSC n'a pas de n° UAI, mais on la prend quand même.
     $query = "SELECT COD_CMP, LIB_CMP, INT_1_EDI_DIP_CMP
     FROM APOGEE.COMPOSANTE WHERE TEM_EN_SVE_CMP = 'O'
-    AND cod_rne_cmp IS NOT NULL";
+    AND (cod_rne_cmp IS NOT NULL or cod_cmp = 'BSC')";
     // AND APOGEE.COMPOSANTE.COD_NAT_CMP = 'J'";
     return $query;
 
