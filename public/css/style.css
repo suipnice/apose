@@ -137,7 +137,22 @@ li[class^="sess-"] {
   font-size: 110%;
 }
 
-.lib-add{
+.lib-cmt {
+  cursor: help;
+  max-width: 20em;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.lib-cmt:hover,
+.lib-cmt:focus-visible {
+  overflow: auto;
+  white-space: normal;
+  width: 20em;
+}
+
+.lib-add {
   font-size: 88%;
   font-weight: normal;
   font-style: italic;

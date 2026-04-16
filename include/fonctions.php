@@ -201,6 +201,7 @@ function connexionMysql(
     $user_mysql = USER_MYSQL,
     $passwd_mysql = PASSWD_MYSQL
 ) {
+    mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
     try {
         $link = new mysqli($hote_mysql, $user_mysql, $passwd_mysql, $base_mysql);
     } catch (mysqli_sql_exception $e) {
@@ -226,21 +227,59 @@ function requete($cnx_mysql, $libreq, $debug = 0, $mode = "")
     debug($libreq);
     if ($mode == "multi") {
         $req = mysqli_multi_query($cnx_mysql, $libreq);
+
+        if ($req === TRUE) {
+            // Comptage du nombre de lignes insérées
+            $totalInserted = 0;
+            do {
+                if ($result = mysqli_store_result($cnx_mysql)) {
+                    // SELECT, ignore
+                    mysqli_free_result($result);
+                } else {
+                    // Pour INSERT, UPDATE, DELETE
+                    $affected = mysqli_affected_rows($cnx_mysql);
+                    if ($affected > 0) {
+                        $totalInserted += $affected;
+                    } else {
+                        report_error($cnx_mysql, $libreq);
+                    }
+                }
+            } while (mysqli_more_results($cnx_mysql) && mysqli_next_result($cnx_mysql));
+            printlog("Nombre de lignes insérées/affectées : $totalInserted");
+
+            // Check for MySQL warnings after each query
+            $warnings = $cnx_mysql->query("SHOW WARNINGS");
+            if ($warnings && $warnings->num_rows > 0) {
+                printlog("MySQL Warnings detected:");
+                while ($row = $warnings->fetch_assoc()) {
+                    echo implode(" | ", $row) . "\n";
+                }
+                die("Script interrompu à cause d'un warning MySQL.\n");
+            }
+        } else {
+            reportError($cnx_mysql, $libreq);
+        }
     } else {
         $req = mysqli_query($cnx_mysql, $libreq);
     }
     if ($debug !== 0) {
         echo $libreq . '<br><br>';
     }
-    if ($mode == "multi") {
-        // Wait until multi query has properly ended.
-        while (mysqli_more_results($cnx_mysql) && mysqli_next_result($cnx_mysql)) {
-            ;
-        }
-    }
+
     if ($req !== false) {
         return $req;
     }
+    reportError($cnx_mysql, $libreq);
+}
+
+/**
+ * Arrete le sript et affiche un détail de l'erreur.
+ *
+ * @param mixed $cnx_mysql
+ * @param mixed $libreq
+ * @return never
+ */
+function reportError($cnx_mysql, $libreq){
     $erreur = "\nErreur requête\n";
     // Pour le debug.
     $erreur .= $libreq . "\n" . MYSQLI_ERROR($cnx_mysql) . "\n";
@@ -369,7 +408,8 @@ function chercheElpFils(
             table_elp.cod_nel, table_elp.cod_pel, table_elp.nbr_crd_elp,
             table_elp_nbetu.nb_etu_ip,
             table_elp.lib_elp_lng,
-            table_elp_nbetu.cod_etp
+            table_elp_nbetu.cod_etp,
+            table_elp.lib_cmt_elp
         FROM table_elp
         INNER JOIN lse_regroupe_elp
             ON table_elp.cod_elp = lse_regroupe_elp.cod_elp
@@ -531,6 +571,16 @@ function chercheElpFils(
             $lib_liste_filles
         ];
 
+        $lib_cmt = $fetched['lib_cmt_elp'];
+        if (strpos($lib_cmt, "[") !== false) {
+            $css_class = "tag is-warning";
+        } else {
+            $css_class = "lib-cmt lib-add";
+        }
+        $lib_cmt = "<$tag rel='cmt'>
+            <span class='$css_class'>".$lib_cmt."</span>
+            </$tag>";
+
         // desc = 1 si il y a des fils/filles.
         if ($desc === 1) {
             foreach ($t_liste_lse_filles as $key => $r2) {
@@ -568,6 +618,8 @@ function chercheElpFils(
                     $card = " de $min à $max élément$pluriel à choisir";
                 }
                 $res .= "<$tag rel='obs'>$card</$tag>";
+
+                $res .= $lib_cmt;
                 if ($numero and $type <> "tableau") {
                     $res .= ":";
                 }
@@ -579,7 +631,7 @@ function chercheElpFils(
 
                 // AFFICHAGE SESSIONS paramètres :
                 // 1=session 1 | 2=session 2
-                // 3=session  unique | 4=toutes les sessions
+                // 3=session unique | 4=toutes les sessions
                 if ($_SESSION['epr'] === 1) {
                     $code_ses = $_SESSION['cod_ses'];
                     if ($code_ses === 4) {
@@ -647,7 +699,7 @@ function chercheElpFils(
         } else {
             // desc = 0 ==> pas de fils/filles.
             if ($type === "tableau") {
-                $res .= "<$tag>&nbsp;</$tag><$tag>&nbsp;</$tag></tr>";
+                $res .= "<$tag>&nbsp;</$tag><$tag>&nbsp;</$tag>$lib_cmt</tr>";
             } else {
                 $res .= "";
             }
@@ -759,4 +811,18 @@ function printlog($log) {
     $date = new DateTime();
     $date = $date->format("Y-m-d H:i:s");
     print("$date -- $log\n");
+}
+
+
+/**
+ * Fonction similaire à trim(), mais remplace les espaces au début et à la fin par des underscores.
+ * Remplace tous les espaces consécutifs au début par un '_', et à la fin par un '_'.
+ *
+ * @param string $string La chaîne à traiter.
+ * @return string La chaîne avec les espaces au début et à la fin remplacés par '_'.
+ */
+function underscore_spaces($string) {
+    $string = preg_replace('/^\s+/', '_', $string);
+    $string = preg_replace('/\s+$/', '_', $string);
+    return $string;
 }

@@ -88,6 +88,7 @@ if ($clean === true) {
     ];
 
     foreach ($tables as $table) {
+        printlog("DELETING ".$table."…");
         requete($cnx_mysql, "DELETE FROM $table");
     }
 }

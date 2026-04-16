@@ -239,19 +239,21 @@ if (isset($_SESSION["authen"]) === false or $_SESSION["authen"] !== 'ok') {
 
                     <div class="field is-horizontal">
                         <div class="field-label">
-                            <input type="checkbox" value="1" class="switch is-rounded"
+                            
+                            <label class="label" for="tree_view">
+                                Indicateur visuel de l’arborescence
+                            </label>
+                            
+                            
+                        </div>
+                        <div class="field-body"><input type="checkbox" value="1" class=""
                                    name="treeView" id="tree_view"
                                     <?php
                                     if ($treeView === true) {
                                         echo "checked";
                                     }
                                     ?>
-                            >
-                            <label class="label" for="tree_view">
-                                Indicateur visuel de l’arborescence
-                            </label>
-                        </div>
-                        <div class="field-body"></div>
+                            ></div>
                     </div>
 
                     <div class="field is-horizontal">
