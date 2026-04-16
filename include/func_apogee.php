@@ -430,7 +430,7 @@ function recupSimple(
 
                 if ($cle !== "COD_ELP") {
                     // Attention certains collent un espace insécable dans leur code ELP !
-                    $valeur= underscore_spaces($valeur);
+                    $valeur = underscore_spaces($valeur);
                 }
 
                 // Colonnes qui doivent être numériques plutôt que chaine vide ''.
