@@ -2,6 +2,7 @@ includes:
     - phpstan-baseline.neon
 
 parameters:
+    tmpDir: tmp
     # Niveau 5 : bon compromis. Pour détecter plus d'erreurs (types nullables,
     # variables non définies, etc.), augmenter le niveau (max 10).
     level: 5
