@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<ruleset name="ApoSE PHP compatibility">
+    <file>.</file>
+    <exclude-pattern>*/vendor/*</exclude-pattern>
+    <exclude-pattern>*/.git/*</exclude-pattern>
+    <arg name="extensions" value="php"/>
+    <config name="testVersion" value="8.2-"/>
+    <rule ref="PHPCompatibility"/>
+</ruleset>

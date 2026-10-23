@@ -419,6 +419,9 @@ function recupSimple(
             $updates = [];
             $nbrows = $nbrows + 1;
             foreach ($row as $cle => $valeur) {
+                // Une colonne Oracle NULL devient null en PHP ; str_replace()
+                // n'accepte plus null depuis PHP 8.1 (deprecated).
+                $valeur = ($valeur ?? '');
                 $valeur = str_replace(",", ".", $valeur);
 
                 // Chars to be replaced.
@@ -430,7 +433,7 @@ function recupSimple(
 
                 if ($cle !== "COD_ELP") {
                     // Attention certains collent un espace insécable dans leur code ELP !
-                    $valeur= underscore_spaces($valeur);
+                    $valeur = underscore_spaces($valeur);
                 }
 
                 // Colonnes qui doivent être numériques plutôt que chaine vide ''.

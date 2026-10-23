@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+<ruleset name="ApoSE dependencies PHP compatibility">
+    <file>vendor/apereo</file>
+    <arg name="extensions" value="php"/>
+    <config name="testVersion" value="7.4-"/>
+    <rule ref="PHPCompatibility"/>
+</ruleset>

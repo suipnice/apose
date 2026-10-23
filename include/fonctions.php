@@ -154,6 +154,10 @@ function identificationLDAP($login)
     $query = "(&(uid=" . $keyword . "))";
     $result = ldap_search($conn, $baseDN, $query);
 
+    if ($result === false) {
+        return "";
+    }
+
     // Lecture du resultat.
     $info = ldap_get_entries($conn, $result);
 
@@ -241,7 +245,7 @@ function requete($cnx_mysql, $libreq, $debug = 0, $mode = "")
                     if ($affected > 0) {
                         $totalInserted += $affected;
                     } else {
-                        report_error($cnx_mysql, $libreq);
+                        reportError($cnx_mysql, $libreq);
                     }
                 }
             } while (mysqli_more_results($cnx_mysql) && mysqli_next_result($cnx_mysql));
@@ -436,7 +440,8 @@ function chercheElpFils(
              FROM table_elp_nbetu
              WHERE table_elp_nbetu.cod_elp = '$cod_elp'
                 AND table_elp_nbetu.cod_etp = '$etp'
-                AND table_elp_nbetu.cod_vrs_etp = '$cod_vrs_vet'"
+                AND table_elp_nbetu.cod_vrs_etp = '$cod_vrs_vet'
+                AND table_elp_nbetu.cod_anu = '$cod_anu'"
         );
         $elp_nbetu = "";
         while (is_array($rnbip = mysqli_fetch_assoc($reqnbip)) === true) {

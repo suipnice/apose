@@ -1,0 +1,42 @@
+name: Mise à jour de la baseline PHPStan
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - '**.php'
+      - composer.json
+      - phpstan.neon
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  baseline:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          extensions: ldap, mysqli
+          tools: composer
+      - run: composer install --no-interaction --prefer-dist --ignore-platform-reqs
+      - run: make phpstan-baseline
+
+      - name: set git config
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions@github.com"
+          git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}
+
+      - name: Commit de la baseline si elle a changé
+        run: |
+          if git diff --quiet -- phpstan-baseline.neon; then
+            echo "Baseline inchangée"
+            exit 0
+          fi
+          git add phpstan-baseline.neon
+          git commit -m "chore: mise à jour automatique de la baseline PHPStan [skip ci]"
+          git push
