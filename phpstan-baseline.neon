@@ -1,32 +1,8 @@
 parameters:
 	ignoreErrors:
 		-
-			message: '#^Argument of an invalid type stdClass supplied for foreach, only iterables are supported\.$#'
-			identifier: foreach.nonIterable
-			count: 2
-			path: cron/debug.php
-
-		-
-			message: '#^PHPDoc tag @return has invalid value \(\[type\]\)\: Unexpected token "\[", expected type at offset 229 on line 8$#'
-			identifier: phpDoc.parseError
-			count: 1
-			path: cron/debug.php
-
-		-
-			message: '#^Return value of function print_r\(\) is always true and the result is printed instead of being returned\. Pass in true as parameter \#2 \$return to return the output instead\.$#'
-			identifier: function.uselessReturnValue
-			count: 3
-			path: cron/debug.php
-
-		-
 			message: '#^Function debug\(\) returns void but does not have any side effects\.$#'
 			identifier: void.pure
-			count: 1
-			path: include/fonctions.php
-
-		-
-			message: '#^Function report_error not found\.$#'
-			identifier: function.notFound
 			count: 1
 			path: include/fonctions.php
 
