@@ -36,3 +36,24 @@ jobs:
       - run: phpcs -q --report=checkstyle | cs2pr
       - run: composer install --no-interaction --prefer-dist --ignore-platform-reqs
       - run: phpcs -q --standard=phpcs-vendor.xml
+
+  phpstan:
+    name: PHPStan (PHP ${{ matrix.php }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { php: '7.4', id: 70400 }
+          - { php: '8.1', id: 80100 }
+          - { php: '8.3', id: 80300 }
+          - { php: '8.4', id: 80400 }
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          extensions: ldap, mysqli
+          tools: composer
+      - run: composer install --no-interaction --prefer-dist --ignore-platform-reqs
+      - run: vendor/bin/phpstan analyse --no-progress --error-format=github -c phpstan-ci.neon

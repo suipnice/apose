@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<ruleset name="Apose PHP compatibility">
+<ruleset name="ApoSE PHP compatibility">
     <file>.</file>
     <exclude-pattern>*/vendor/*</exclude-pattern>
     <exclude-pattern>*/.git/*</exclude-pattern>

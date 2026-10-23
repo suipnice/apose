@@ -1,0 +1,14 @@
+parameters:
+    # Niveau 5 : bon compromis. Pour détecter plus d'erreurs (types nullables,
+    # variables non définies, etc.), augmenter le niveau (max 10).
+    level: 5
+    paths:
+        - cron
+        - include
+        - public
+    excludePaths:
+        analyseAndScan:
+            - tests (?)
+    scanFiles:
+        - param-dist.php
+    treatPhpDocTypesAsCertain: false
