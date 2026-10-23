@@ -1,20 +1,8 @@
 includes:
+    - phpstan.neon
     - phpstan-baseline.neon
 
 parameters:
     tmpDir: tmp
-    # Niveau 5 : bon compromis. Pour détecter plus d'erreurs (types nullables,
-    # variables non définies, etc.), augmenter le niveau (max 10).
-    level: 5
-    paths:
-        - cron
-        - include
-        - public
-    excludePaths:
-        analyseAndScan:
-            - tests (?)
-    scanFiles:
-        - param-dist.php
-    treatPhpDocTypesAsCertain: false
     # Une erreur corrigée mais encore présente dans la baseline ne doit pas faire échouer la CI
     reportUnmatchedIgnoredErrors: false

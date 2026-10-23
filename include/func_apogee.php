@@ -44,7 +44,7 @@ function connexionOracle(
  *
  * @param string $year Année universitaire
  *
- * @return [type]
+ * @return string
  */
 function queryTableEtape($year)
 {
@@ -74,7 +74,7 @@ GROUP BY APOGEE.INS_ADM_ETP.COD_ANU,APOGEE.INS_ADM_ETP.COD_ETP,
  *
  * @param string $year Année universitaire
  *
- * @return [type]
+ * @return string
  */
 function queryEtape($year)
 {
@@ -138,7 +138,7 @@ function queryAnneeUniApoOuverte()
 /**
  * [Description for queryEpreuve]
  *
- * @return [type]
+ * @return string
  */
 function queryEpreuve()
 {
@@ -152,7 +152,7 @@ FROM APOGEE.EPREUVE";
 /**
  * [Description for queryEprSanctionneElp]
  *
- * @return [type]
+ * @return string
  */
 function queryEprSanctionneElp()
 {
@@ -167,7 +167,7 @@ function queryEprSanctionneElp()
 /**
  * [Description for queryComposante]
  *
- * @return [type]
+ * @return string
  */
 function queryComposante()
 {
@@ -187,7 +187,7 @@ function queryComposante()
  *
  * @param string $year Année universitaire
  *
- * @return [type]
+ * @return string
  */
 function queryTableEtapeNbetu($year)
 {
@@ -214,7 +214,7 @@ GROUP BY APOGEE.INS_ADM_ETP.COD_ANU,APOGEE.INS_ADM_ETP.COD_ETP,
  *
  * @param string $year Année universitaire
  *
- * @return [type]
+ * @return string
  */
 function queryTableElpNbetu($year)
 {
@@ -237,7 +237,7 @@ GROUP BY APOGEE.IND_CONTRAT_ELP.COD_ANU,
 /**
  * [Description for queryVetRegrLse]
  *
- * @return [type]
+ * @return string
  */
 function queryVetRegrLse()
 {
@@ -253,7 +253,7 @@ function queryVetRegrLse()
 /**
  * [Description for queryElpRegroupeLse]
  *
- * @return [type]
+ * @return string
  */
 function queryElpRegroupeLse()
 {
@@ -268,7 +268,7 @@ function queryElpRegroupeLse()
 /**
  * [Description for queryListes]
  *
- * @return [type]
+ * @return string
  */
 function queryListes()
 {
@@ -282,7 +282,7 @@ FROM APOGEE.liste_elp";
 /**
  * [Description for queryLseRegroupeElp]
  *
- * @return [type]
+ * @return string
  */
 function queryLseRegroupeElp()
 {
@@ -329,7 +329,7 @@ function queryTableElp()
  *
  * @param string $year Année universitaire
  *
- * @return [type]
+ * @return string
  */
 function queryTableElpChargeEns($year)
 {
@@ -351,7 +351,7 @@ AND APOGEE.ELP_CHARGE_ENS.TEM_CAL_CHG = 'O'";
  *
  * @param string $year Année universitaire
  *
- * @return [type]
+ * @return string
  */
 function queryTableChargeTypEns($year)
 {
@@ -369,7 +369,7 @@ function queryTableChargeTypEns($year)
 /**
  * [Description for queryTableTypHeure]
  *
- * @return [type]
+ * @return string
  */
 function queryTableTypHeure()
 {
@@ -391,7 +391,7 @@ function queryTableTypHeure()
  * @param mixed  $table_mysql Nom de la table
  * @param string $lib_query   Requete SQL
  *
- * @return [type]
+ * @return void
  */
 function recupSimple(
     $cnx_mysql,
@@ -418,7 +418,7 @@ function recupSimple(
             $sql = "'";
             $updates = [];
             $nbrows = $nbrows + 1;
-            foreach ($row as $cle => $valeur) {
+            foreach (get_object_vars($row) as $cle => $valeur) {
                 // Une colonne Oracle NULL devient null en PHP ; str_replace()
                 // n'accepte plus null depuis PHP 8.1 (deprecated).
                 $valeur = ($valeur ?? '');
@@ -526,7 +526,7 @@ function recupSimple(
         echo "cursor = '$cursor' // result = $result";
         die(
             "Erreur Requete ORACLE \n$lib_query\n
-            " . print_r($err['message']) . "\n"
+            " . print_r($err['message'], true) . "\n"
         );
     }//end if
 

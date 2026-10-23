@@ -12,3 +12,13 @@ parameters:
     scanFiles:
         - param-dist.php
     treatPhpDocTypesAsCertain: false
+    # Constantes définies par param.php : leur valeur dépend de l'installation
+    dynamicConstantNames:
+        - APP_MODE_TEST
+        - APP_MODE_DEBUG
+        - SYLLABUS_LINK
+    ignoreErrors:
+        # param.php est propre à chaque installation (cf. param-dist.php)
+        -
+            identifier: require.fileNotFound
+            path: include/fonctions.php

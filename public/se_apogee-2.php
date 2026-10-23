@@ -26,6 +26,18 @@ if (isset($_SESSION["authen"]) === false or $_SESSION["authen"] !== 'ok') {
     $adresse = "";
     $cpt = 0;
     $entetes = [];
+    // Valeurs par défaut, si la page est appelée sans données POSTées.
+    $cod_etp_cible = "";
+    $cod_vrs_vet = "";
+    $comp = "";
+    $cod_anu = "";
+    $cycle = "";
+    $numero = "";
+    $treeView = "";
+    $ladd = "";
+    $charge = "";
+    $lib_comp = "";
+    $lib_liste = "";
 
     if (empty($_POST) === false) {
         $RefEtp = filter_input(INPUT_POST, "RefEtp");

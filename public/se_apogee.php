@@ -196,6 +196,7 @@ if (isset($_SESSION["authen"]) === false or $_SESSION["authen"] !== 'ok') {
                 $cnx_mysql,
                 "SELECT lib_cmp FROM composante WHERE cod_cmp='$comp'"
             );
+            $lib_comp = "";
             while (is_array($row = mysqli_fetch_row($reqa)) === true) {
                 $lib_comp = $row[0];
             }

@@ -39,7 +39,7 @@ phpstan-level-8:
 
 # Régénère la baseline PHPStan (erreurs existantes ignorées)
 phpstan-baseline:
-	vendor/bin/phpstan analyse --no-progress --error-format=raw --configuration=phpstan.neon --generate-baseline phpstan-baseline.neon
+	vendor/bin/phpstan analyse --no-progress --error-format=raw --configuration=phpstan.neon --generate-baseline phpstan-baseline.neon --allow-empty-baseline
 
 # Analyse PHPStan comme en CI, avec la baseline
 phpstan-ci:
